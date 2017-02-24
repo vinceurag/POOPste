@@ -1,4 +1,4 @@
-package com.example.wholovesyellow.poopste;
+package com.callofnature.poopste;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;

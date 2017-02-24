@@ -1,4 +1,4 @@
-package com.example.wholovesyellow.poopste;
+package com.callofnature.poopste;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.example.wholovesyellow.poopste", appContext.getPackageName());
+        assertEquals("com.callofnature.poopste", appContext.getPackageName());
     }
 }
