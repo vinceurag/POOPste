@@ -5,7 +5,8 @@
         <item
             android:id="@+id/nav_news_feed"
             android:icon="@drawable/nav_news_feed_icon"
-            android:title="The Feed" />
+            android:title="The Feed"
+            android:checked="true"/>
         <item
             android:id="@+id/nav_nearby"
             android:icon="@drawable/nav_nearby"
