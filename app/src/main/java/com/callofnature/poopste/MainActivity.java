@@ -90,7 +90,10 @@ public class MainActivity extends AppCompatActivity
             fragmentTransaction.replace(R.id.mainFrame, newsFeed);
             fragmentTransaction.commit();
         } else if (id == R.id.nav_nearby) {
-
+            NearbyThronesFragment nearbyThrones = new NearbyThronesFragment();
+            android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.mainFrame, nearbyThrones);
+            fragmentTransaction.commit();
         } else if (id == R.id.nav_leaderboard) {
             LeaderboardFragment leaderboard = new LeaderboardFragment();
             android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
