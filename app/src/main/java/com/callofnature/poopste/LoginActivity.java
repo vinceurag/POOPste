@@ -73,7 +73,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mLoginFormView;
 
     // Google Sign In
-    private GoogleApiClient mGoogleApiClient;
+    UserSessionManager session;
     private static final int RC_SIGN_IN = 1;
     private static final String TAG = LoginActivity.class.getSimpleName();
 
@@ -81,18 +81,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
 
-        // Google Sign-in
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
+
         findViewById(R.id.sign_in_button).setOnClickListener(this);
         SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
         signInButton.setSize(SignInButton.SIZE_WIDE);
@@ -319,7 +313,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private void signIn() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        session = new UserSessionManager(getApplicationContext());
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(session.mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
@@ -350,11 +345,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private void handleSignInResult(GoogleSignInResult result) {
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
+
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
             Log.e("SUCCESS", "Login Successful");
-            Toast.makeText(getApplicationContext(), "Successful Login", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Successful - " + acct.getGivenName() + " " + acct.getFamilyName(), Toast.LENGTH_LONG).show();
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             LoginActivity.this.startActivity(intent);
         } else {

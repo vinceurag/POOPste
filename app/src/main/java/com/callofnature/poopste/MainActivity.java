@@ -1,9 +1,12 @@
 package com.callofnature.poopste;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,17 +16,28 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
 
     NavigationView navigationView = null;
     Toolbar toolbar = null;
+    UserSessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        session = new UserSessionManager(getApplicationContext());
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -52,6 +66,7 @@ public class MainActivity extends AppCompatActivity
         fragmentTransaction.commit();
 
     }
+
 
     @Override
     public void onBackPressed() {
@@ -112,7 +127,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_report) {
 
         }else if (id == R.id.nav_logout) {
-
+            signOut();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -123,5 +138,37 @@ public class MainActivity extends AppCompatActivity
     public void setActionBarTitle(String title){
         getSupportActionBar().setTitle("");
         getSupportActionBar().setTitle(title);
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    private void signOut() {
+        Log.d("TAG", "Signout clicked");
+
+        if(session.mGoogleApiClient.isConnected()) {
+            Auth.GoogleSignInApi.signOut(session.mGoogleApiClient).setResultCallback(
+                    new ResultCallback<Status>() {
+                        @Override
+                        public void onResult(Status status) {
+
+                            if(status.isSuccess()) {
+                                Toast.makeText(getApplicationContext(),"Logged Out - with Google" ,Toast.LENGTH_LONG).show();
+                                Intent i=new Intent(getApplicationContext(), LoginActivity.class);
+                                startActivity(i);
+                            } else {
+                                Toast.makeText(getApplicationContext(),"Failed to Logout" ,Toast.LENGTH_LONG).show();
+
+                            }
+
+                        }
+                    });
+        } else {
+            Toast.makeText(getApplicationContext(),"Logged Out - not google" ,Toast.LENGTH_LONG).show();
+            Intent i=new Intent(getApplicationContext(), LoginActivity.class);
+            startActivity(i);
+        }
     }
 }
