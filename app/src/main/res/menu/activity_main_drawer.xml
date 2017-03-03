@@ -19,6 +19,10 @@
             android:id="@+id/nav_report"
             android:icon="@drawable/nav_report"
             android:title="Report a bug" />
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/nav_logout_icon"
+            android:title="Logout" />
     </group>
 
 </menu>
