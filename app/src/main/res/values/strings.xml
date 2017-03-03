@@ -24,4 +24,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_leaderboard">LeaderboardActivity</string>
     <string name="section_format">Hello World from section: %1$d</string>
+
+    <string name="server_client_id">61145288571-mev92g8o7e99mje7pi9ediik1lsnk88g.apps.googleusercontent.com</string>
 </resources>

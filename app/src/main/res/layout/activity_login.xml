@@ -133,15 +133,20 @@
                 android:textSize="15dp"
                 android:id="@+id/or"
                 android:textAlignment="center" />
-            <Button
-                android:id="@+id/email_sign_in_google_button"
-                style="@android:style/TextAppearance.Material.Small"
-                android:layout_width="match_parent"
+            <!--<Button-->
+                <!--android:id="@+id/email_sign_in_google_button"-->
+                <!--style="@android:style/TextAppearance.Material.Small"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_marginTop="16dp"-->
+                <!--android:text="Sign in with Google"-->
+                <!--android:textStyle="bold"-->
+                <!--android:background="@drawable/button_border" />-->
+            <com.google.android.gms.common.SignInButton
+                android:id="@+id/sign_in_button"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Sign in with Google"
-                android:textStyle="bold"
-                android:background="@drawable/button_border" />
+                android:layout_gravity="center"/>
 
         </LinearLayout>
     </ScrollView>
