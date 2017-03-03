@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "61145288571",
+    "project_id": "poopsteapp"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:61145288571:android:1c9713abcfdd66a7",
+        "android_client_info": {
+          "package_name": "com.callofnature.poopste"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "61145288571-mev92g8o7e99mje7pi9ediik1lsnk88g.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "61145288571-12r11s88r42q5vb54ddems1376avvjn4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.callofnature.poopste",
+            "certificate_hash": "c35e2c477561f2969bf1ef53d519a12a4dd9ac5e"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyADiOvrCBMLEy5fTnRMqSD3Xri3O2AIg-o"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
