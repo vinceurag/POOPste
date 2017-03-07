@@ -13,21 +13,21 @@
       },
       "oauth_client": [
         {
-          "client_id": "61145288571-mev92g8o7e99mje7pi9ediik1lsnk88g.apps.googleusercontent.com",
+          "client_id": "61145288571-8ndk339ed1nvtau8c5i1pf3ntqvfi66a.apps.googleusercontent.com",
           "client_type": 3
         },
         {
-          "client_id": "61145288571-12r11s88r42q5vb54ddems1376avvjn4.apps.googleusercontent.com",
+          "client_id": "61145288571-m78ofdpivnv58ulhhpr10ktjcepngaa4.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.callofnature.poopste",
-            "certificate_hash": "c35e2c477561f2969bf1ef53d519a12a4dd9ac5e"
+            "certificate_hash": "cc1d5bd02f1de342fd440782eb49dfa7d66c6bdd"
           }
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyADiOvrCBMLEy5fTnRMqSD3Xri3O2AIg-o"
+          "current_key": "AIzaSyAdx-9xXgSqyNY03CKfbEheKpUyDHdJU0c"
         }
       ],
       "services": {

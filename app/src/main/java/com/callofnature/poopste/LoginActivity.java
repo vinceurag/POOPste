@@ -31,6 +31,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.callofnature.poopste.helpers.PoopsteApi;
+import com.callofnature.poopste.model.Model;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -38,9 +40,17 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.entity.StringEntity;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -339,23 +349,80 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            handleSignInResult(result);
+            try {
+                handleSignInResult(result);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    private void handleSignInResult(GoogleSignInResult result) {
+    private void handleSignInResult(GoogleSignInResult result) throws JSONException, UnsupportedEncodingException {
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
-
         if (result.isSuccess()) {
+            Log.d("TEST", "Pumasok");
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            Log.e("SUCCESS", "Login Successful");
-            Toast.makeText(getApplicationContext(), "Successful - " + acct.getGivenName() + " " + acct.getFamilyName(), Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            LoginActivity.this.startActivity(intent);
+            final String myGoogleId = acct.getId();
+            JSONObject jsonParams = new JSONObject();
+            jsonParams.put("google_id", acct.getId());
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            PoopsteApi.post("auth/google", entity, new AsyncHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                    Log.d("SUCCESS", "User is registered. Loggin in...");
+                    try {
+                        String response = new String(responseBody, "UTF-8");
+                        JSONObject obj = new JSONObject(response);
+                        JSONObject meta = obj.getJSONObject("meta");
+                        JSONObject data = obj.getJSONObject("data");
+
+                        int id = Integer.parseInt(obj.getString("id"));
+                        String googleId = data.getString("google_id");
+                        String fullName = data.getString("fullname");
+                        String profilePic = data.getString("profile_pic");
+                        String token = meta.getString("token");
+
+                        Model.setUserId(id);
+                        Model.setFullName(fullName);
+                        Model.setGoogleId(googleId);
+                        Model.setProfilePic(profilePic);
+                        Model.setToken(token);
+
+                        Toast.makeText(getApplicationContext(), googleId + " - " + fullName, Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        LoginActivity.this.startActivity(intent);
+                        finish();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                    Log.d("FAILURE", "User is not yet registered.");
+                    try {
+                        String response = new String(responseBody, "UTF-8");
+                        JSONObject obj = new JSONObject(response);
+                        JSONObject meta = obj.getJSONObject("meta");
+                        Log.d("META", meta.getString("token") + " - " + myGoogleId);
+                        if(meta.getString("token").equals("null")) {
+                            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                            intent.putExtra("googleId", myGoogleId);
+                            LoginActivity.this.startActivity(intent);
+                        }
+
+                    } catch(Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         } else {
             // Signed out, show unauthenticated UI.
-            Log.e("ERROR", "Login Failed");
+            Log.e("ERROR", "Login Failed - " + result.getStatus());
             Toast.makeText(getApplicationContext(), "Failed Login", Toast.LENGTH_LONG).show();
         }
     }

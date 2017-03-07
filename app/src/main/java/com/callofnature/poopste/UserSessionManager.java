@@ -29,12 +29,14 @@ public class UserSessionManager implements GoogleApiClient.OnConnectionFailedLis
 
         // Google Sign-in
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("61145288571-8ndk339ed1nvtau8c5i1pf3ntqvfi66a.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
         mGoogleApiClient = new GoogleApiClient.Builder(_context)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .addConnectionCallbacks(this).build();
         mGoogleApiClient.connect();
+
     }
 
     @Override

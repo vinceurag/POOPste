@@ -16,14 +16,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.callofnature.poopste.model.Model;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
@@ -31,11 +35,35 @@ public class MainActivity extends AppCompatActivity
     NavigationView navigationView = null;
     Toolbar toolbar = null;
     UserSessionManager session;
+    TextView name;
+    ImageView profilePic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View navHeaderView = navigationView.getHeaderView(0);
+
+        name = (TextView) navHeaderView.findViewById(R.id.fullname);
+        profilePic = (ImageView) navHeaderView.findViewById(R.id.profilePic);
+        name.setText(Model.getFullName());
+        Picasso.with(this)
+                .load(Model.getProfilePic())
+                .fit()
+                .centerCrop()
+                .into(profilePic);
+        Log.d("Name", Model.getFullName());
+
+        Intent caller = getIntent();
+        Bundle extras = caller.getExtras();
+        if (extras != null) {
+            if (extras.containsKey("userRegistered")) {
+                Snackbar mySnackbar = Snackbar.make(findViewById(R.id.content_main),
+                        "Thank you for registering! Have a nice day!", Snackbar.LENGTH_SHORT);
+                mySnackbar.show();
+            }
+        }
 
         session = new UserSessionManager(getApplicationContext());
 
@@ -165,6 +193,7 @@ public class MainActivity extends AppCompatActivity
 
                         }
                     });
+            finish();
         } else {
             Toast.makeText(getApplicationContext(),"Logged Out - not google" ,Toast.LENGTH_LONG).show();
             Intent i=new Intent(getApplicationContext(), LoginActivity.class);
