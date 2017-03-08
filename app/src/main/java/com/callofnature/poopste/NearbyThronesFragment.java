@@ -21,6 +21,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -36,6 +37,7 @@ public class NearbyThronesFragment extends Fragment {
     private GoogleMap googleMap;
     View rootView;
     private static final int REQUEST_LOCATIONS = 7;
+    private SlidingUpPanelLayout mLayout;
 
     public NearbyThronesFragment() {
         // Required empty public constructor
@@ -48,6 +50,9 @@ public class NearbyThronesFragment extends Fragment {
         // Inflate the layout for this fragment
         ((MainActivity)getActivity()).setActionBarTitle("Nearby Thrones");
         rootView = inflater.inflate(R.layout.fragment_nearby_thrones, container, false);
+        mLayout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
+        mLayout.setAnchorPoint(0.5f);
+        mLayout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
         mayRequestLocation();
 
         mMapView = (MapView) rootView.findViewById(R.id.mapView);
