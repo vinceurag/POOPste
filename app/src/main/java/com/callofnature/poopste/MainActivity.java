@@ -60,8 +60,18 @@ public class MainActivity extends AppCompatActivity
         if (extras != null) {
             if (extras.containsKey("userRegistered")) {
                 Snackbar mySnackbar = Snackbar.make(findViewById(R.id.content_main),
-                        "Thank you for registering! Have a nice day!", Snackbar.LENGTH_SHORT);
+                        "Thank you for registering! Have a nice day!", Snackbar.LENGTH_LONG);
                 mySnackbar.show();
+            } else if (extras.containsKey("postCreated")) {
+                if(caller.getStringExtra("postCreated").equals("successful")) {
+                    Snackbar mySnackbar = Snackbar.make(findViewById(R.id.content_main),
+                            "New status has been posted!", Snackbar.LENGTH_LONG);
+                    mySnackbar.show();
+                } else {
+                    Snackbar mySnackbar = Snackbar.make(findViewById(R.id.content_main),
+                            "An error occured while posting your status. :(", Snackbar.LENGTH_LONG);
+                    mySnackbar.show();
+                }
             }
         }
 
@@ -74,8 +84,9 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "TODO: User can post a status update", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent i = new Intent(getApplicationContext(), NewPostActivity.class);
+                startActivity(i);
+                overridePendingTransition(R.anim.pull_up_from_bottom, R.anim.hold);
             }
         });
 
@@ -184,6 +195,7 @@ public class MainActivity extends AppCompatActivity
 
                             if(status.isSuccess()) {
                                 Toast.makeText(getApplicationContext(),"Logged Out - with Google" ,Toast.LENGTH_LONG).show();
+                                Model.setToken(null);
                                 Intent i=new Intent(getApplicationContext(), LoginActivity.class);
                                 startActivity(i);
                             } else {

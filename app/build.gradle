@@ -21,7 +21,7 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -32,12 +32,14 @@ dependencies {
     compile 'com.google.android.gms:play-services-auth:10.2.0'
     compile 'com.sothree.slidinguppanel:library:3.3.1'
     compile 'com.loopj.android:android-async-http:1.4.9'
-    compile 'com.android.support.constraint:constraint-layout:+'
-    testCompile 'junit:junit:4.12'
     compile 'com.amazonaws:aws-android-sdk-core:2.3.+'
     compile 'com.amazonaws:aws-android-sdk-cognito:2.3.+'
     compile 'com.amazonaws:aws-android-sdk-s3:2.3.+'
     compile 'com.amazonaws:aws-android-sdk-ddb:2.3.+'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile 'com.github.jlmd:AnimatedCircleLoadingView:1.1.5@aar'
+    compile 'com.afollestad.material-dialogs:core:0.9.3.0'
 }
 apply plugin: 'com.google.gms.google-services'

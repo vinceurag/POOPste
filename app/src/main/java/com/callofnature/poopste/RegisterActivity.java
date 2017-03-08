@@ -47,7 +47,7 @@ public class RegisterActivity extends AppCompatActivity {
     String imageName;
     Long tsLong;
     String ts;
-    String fileName;
+    String fileName = "";
 
     File fileToUpload;
     AmazonS3 s3;
@@ -155,7 +155,7 @@ public class RegisterActivity extends AppCompatActivity {
         tsLong = System.currentTimeMillis()/1000;
         ts = tsLong.toString();
 
-        fileName = "images/" + ts + "-" + imageName;
+        fileName = "profile_pictures/" + ts + "-" + imageName;
 
         TransferObserver transferObserver = transferUtility.upload(
                 "poopste-images-bucket",     /* The bucket to upload to */
