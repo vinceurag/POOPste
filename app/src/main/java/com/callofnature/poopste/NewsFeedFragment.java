@@ -22,7 +22,9 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
@@ -60,6 +62,10 @@ public class NewsFeedFragment extends Fragment {
     Feed post;
     ProgressBar loadingCircle;
     SwipeRefreshLayout swipeRefreshLayout;
+
+    SimpleDateFormat sdfDate;
+    String posting_date;
+    String strDate;
 
     /**
      * Use this factory method to create a new instance of
@@ -145,9 +151,15 @@ public class NewsFeedFragment extends Fragment {
                 for(int i = 0; i < jsonPosts.length(); i++) {
                     try {
                         JSONObject objPost = jsonPosts.getJSONObject(i);
-                        post = new Feed(objPost.getString("fullname"), objPost.getString("status"), objPost.getString("profile_pic"), objPost.getString("photo"));
+                        String dateStr = objPost.getString("date_created");
+                        Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(dateStr);
+                        sdfDate = new SimpleDateFormat("MMM. dd, yyyy hh:mm aaa");//dd/MM/yyyy
+                        posting_date = sdfDate.format(date);
+
+                        post = new Feed(objPost.getString("fullname"), objPost.getString("status"), objPost.getString("profile_pic"), objPost.getString("photo"), posting_date);
                         posts.add(post);
-                        Log.d("Status", objPost.getString("fullname"));
+
+                        Log.d("Status", strDate.getClass().getName());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

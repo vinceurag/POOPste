@@ -1,5 +1,7 @@
 package com.callofnature.poopste.model;
 
+import java.util.Date;
+
 /**
  * Created by vinceurag on 09/03/2017.
  */
@@ -10,23 +12,16 @@ public class Feed {
     private String status;
     private String profile_pic;
     private String photo_url;
+    private String datePosted;
 
-    public Feed (String name, String status, String profile_pic, String photo_url) {
+    public Feed (String name, String status, String profile_pic, String photo_url, String datePosted) {
         this.name = name;
         this.status = status;
         this.profile_pic = profile_pic;
         this.photo_url = photo_url;
+        this.datePosted = datePosted;
     }
 
-    public String getPost_date() {
-        return post_date;
-    }
-
-    public void setPost_date(String post_date) {
-        this.post_date = post_date;
-    }
-
-    private String post_date;
 
     public String getName() {
         return name;
@@ -58,6 +53,14 @@ public class Feed {
 
     public void setPhoto_url(String photo_url) {
         this.photo_url = photo_url;
+    }
+
+    public String getDatePosted() {
+        return datePosted;
+    }
+
+    public void setDatePosted(String datePosted) {
+        this.datePosted = datePosted;
     }
 
 }

@@ -53,7 +53,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         Feed post = posts.get(position);
         holder.name.setText(post.getName());
         holder.status.setText(post.getStatus());
-        holder.post_date.setText(post.getPost_date());
+        holder.post_date.setText((CharSequence) post.getDatePosted());
         Picasso.with(holder.profile_pic.getContext()).load(post.getProfile_pic()).fit().centerCrop().into(holder.profile_pic);
         if(!post.getPhoto_url().isEmpty() || !post.getPhoto_url().equals("")) {
             Picasso.with(holder.post_photo_url.getContext()).load(post.getPhoto_url()).placeholder(R.drawable.progress_spin).fit().centerCrop().into(holder.post_photo_url);
