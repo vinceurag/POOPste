@@ -36,6 +36,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.callofnature.poopste.helpers.NetworkConnection;
 import com.callofnature.poopste.helpers.PoopsteApi;
 import com.callofnature.poopste.model.Model;
 import com.google.android.gms.auth.api.Auth;
@@ -303,9 +304,25 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private void signIn() {
-        session = new UserSessionManager(getApplicationContext());
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(session.mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        if(NetworkConnection.isConnectedToNetwork(this))
+        {
+            session = new UserSessionManager(getApplicationContext());
+            Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(session.mGoogleApiClient);
+            startActivityForResult(signInIntent, RC_SIGN_IN);
+        }
+        else
+        {
+            Snackbar mySnackbar = Snackbar
+                    .make(findViewById(R.id.activity_login),"Not connected to a network.", Snackbar.LENGTH_LONG)
+                    .setAction("Retry", new View.OnClickListener(){
+                        @Override
+                        public void onClick(View view){
+                            signIn();
+                        }
+                    });
+            mySnackbar.setActionTextColor(getResources().getColor(R.color.colorPrimary));
+            mySnackbar.show();
+        }
     }
 
     @Override

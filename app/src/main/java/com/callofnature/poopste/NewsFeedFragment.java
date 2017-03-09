@@ -3,6 +3,7 @@ package com.callofnature.poopste;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.callofnature.poopste.adapters.FeedAdapter;
+import com.callofnature.poopste.helpers.NetworkConnection;
 import com.callofnature.poopste.helpers.PoopsteApi;
 import com.callofnature.poopste.model.Feed;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -179,7 +181,23 @@ public class NewsFeedFragment extends Fragment {
     }
 
     private void refreshContent(final View rootView){
-        prepareFeedData();
+        if(NetworkConnection.isConnectedToNetwork(getActivity().getApplicationContext()))
+        {
+            prepareFeedData();
+        }
+        else
+        {
+            Snackbar mySnackbar = Snackbar
+                    .make(rootView,"Not connected to a network.", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Retry", new View.OnClickListener(){
+                        @Override
+                        public void onClick(View view){
+                            refreshContent(rootView);
+                        }
+                    });
+            mySnackbar.setActionTextColor(getResources().getColor(R.color.colorPrimary));
+            mySnackbar.show();
+        }
     }
 
     @Override
