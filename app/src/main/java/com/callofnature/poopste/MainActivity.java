@@ -72,8 +72,6 @@ public class MainActivity extends AppCompatActivity
                             "An error occured while posting your status. :(", Snackbar.LENGTH_LONG);
                     mySnackbar.show();
                 }
-            }else if (extras.containsKey("failed_post")) {
-
             }
         }
 
@@ -132,6 +130,11 @@ public class MainActivity extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
