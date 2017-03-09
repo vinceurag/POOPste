@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -69,6 +70,7 @@ public class NewsFeedFragment extends Fragment {
     String posting_date;
     String strDate;
 
+    private View rootView;
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -87,20 +89,13 @@ public class NewsFeedFragment extends Fragment {
         return fragment;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-
-        prepareFeedData();
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         ((MainActivity)getActivity()).setActionBarTitle("News Feed");
         // Inflate the layout for this fragment
-        final View rootView = inflater.inflate(R.layout.fragment_news_feed, container, false);
+        rootView = inflater.inflate(R.layout.fragment_news_feed, container, false);
         swipeRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorPrimary), getResources().getColor(R.color.colorAccent), getResources().getColor(R.color.accepted));
 
@@ -114,8 +109,34 @@ public class NewsFeedFragment extends Fragment {
             }
         });
 
-
         return rootView;
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        if(NetworkConnection.isConnectedToNetwork(getActivity().getApplicationContext()))
+        {
+            prepareFeedData();
+        }
+        else
+        {
+            Snackbar mySnackbar = Snackbar
+                    .make(getView(),"Not connected to a network.", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Retry", new View.OnClickListener(){
+                        @Override
+                        public void onClick(View view){
+                            NewsFeedFragment newsFeed = new NewsFeedFragment();
+                            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                            fragmentTransaction.add(newsFeed, "News Feed")
+                                    .replace(R.id.news_feed, newsFeed)
+                                    .commit();
+                            refreshContent(getView());
+                        }
+                    });
+            mySnackbar.setActionTextColor(getResources().getColor(R.color.colorPrimary));
+            mySnackbar.show();
+        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event

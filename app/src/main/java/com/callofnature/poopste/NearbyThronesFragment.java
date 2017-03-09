@@ -9,10 +9,12 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.callofnature.poopste.helpers.NetworkConnection;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -95,6 +97,32 @@ public class NearbyThronesFragment extends Fragment {
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        if(NetworkConnection.isConnectedToNetwork(getActivity().getApplicationContext()))
+        {
+            
+        }
+        else
+        {
+            Snackbar mySnackbar = Snackbar
+                    .make(getView(),"Not connected to a network.", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Retry", new View.OnClickListener(){
+                        @Override
+                        public void onClick(View view){
+                            NearbyThronesFragment nearbyThrones = new NearbyThronesFragment();
+                            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                            fragmentTransaction.add(nearbyThrones, "Nearby Thrones")
+                                    .replace(R.id.nearby_thrones, nearbyThrones)
+                                    .commit();
+                        }
+                    });
+            mySnackbar.setActionTextColor(getResources().getColor(R.color.colorPrimary));
+            mySnackbar.show();
+        }
     }
 
     public boolean mayRequestLocation() {

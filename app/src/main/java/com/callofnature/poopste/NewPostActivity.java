@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -32,6 +33,7 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.callofnature.poopste.helpers.NetworkConnection;
 import com.callofnature.poopste.helpers.PoopsteApi;
 import com.callofnature.poopste.model.Model;
 import com.github.jlmd.animatedcircleloadingview.AnimatedCircleLoadingView;
@@ -234,40 +236,54 @@ public class NewPostActivity extends AppCompatActivity {
     }
 
     public void postStatus() {
+        if(NetworkConnection.isConnectedToNetwork(this))
+        {
+            disableButtons = true;
+            invalidateOptionsMenu();
+            linLay.setVisibility(View.GONE);
+
+            msg_status = status.getText().toString();
+
+            cv.setVisibility(View.VISIBLE);
+
+            cv.startIndeterminate();
+            if(!picturePath.equals("")) {
+                tsLong = System.currentTimeMillis()/1000;
+                ts = tsLong.toString();
+
+                fileName = "feed_images/" + ts + "-" + imageName;
+
+                TransferObserver transferObserver = transferUtility.upload(
+                        "poopste-images-bucket",     /* The bucket to upload to */
+                        fileName,    /* The key for the uploaded object */
+                        fileToUpload,        /* The file where the data to upload exists */
+                        CannedAccessControlList.PublicRead
+                );
 
 
-        disableButtons = true;
-        invalidateOptionsMenu();
-        linLay.setVisibility(View.GONE);
+                Log.d("TAG", fileToUpload.toString());
 
-        msg_status = status.getText().toString();
+                Log.d("TAG", "FROM UPLOAD: " + picturePath);
+                Log.d("URL", transferObserver.getAbsoluteFilePath());
+                transferObserverListener(transferObserver);
 
-        cv.setVisibility(View.VISIBLE);
-
-        cv.startIndeterminate();
-        if(!picturePath.equals("")) {
-            tsLong = System.currentTimeMillis()/1000;
-            ts = tsLong.toString();
-
-            fileName = "feed_images/" + ts + "-" + imageName;
-
-            TransferObserver transferObserver = transferUtility.upload(
-                    "poopste-images-bucket",     /* The bucket to upload to */
-                    fileName,    /* The key for the uploaded object */
-                    fileToUpload,        /* The file where the data to upload exists */
-                    CannedAccessControlList.PublicRead
-            );
-
-
-            Log.d("TAG", fileToUpload.toString());
-
-            Log.d("TAG", "FROM UPLOAD: " + picturePath);
-            Log.d("URL", transferObserver.getAbsoluteFilePath());
-            transferObserverListener(transferObserver);
-
-        } else {
-            Log.e("NO IMAGE", "You did not select any image");
-            sendDataToApi();
+            } else {
+                Log.e("NO IMAGE", "You did not select any image");
+                sendDataToApi();
+            }
+        }
+        else
+        {
+            Snackbar mySnackbar = Snackbar
+                    .make(findViewById(R.id.new_post),"Can't Post. Not connected to a network.", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Retry", new View.OnClickListener(){
+                        @Override
+                        public void onClick(View view){
+                            postStatus();
+                        }
+                    });
+            mySnackbar.setActionTextColor(getResources().getColor(R.color.colorPrimary));
+            mySnackbar.show();
         }
 
     }
