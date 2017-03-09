@@ -7,85 +7,32 @@
 
 
 
-    <LinearLayout
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/feed_bg"
+        android:visibility="gone">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:scrollbars="vertical"
+            android:divider="@null"/>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <LinearLayout android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-
-        android:layout_marginLeft="@dimen/feed_item_margin"
-        android:layout_marginRight="@dimen/feed_item_margin"
-        android:layout_marginTop="@dimen/feed_item_margin"
-        android:background="@drawable/bg_news_feed_roundcorner"
-        android:orientation="vertical"
-        android:paddingBottom="@dimen/feed_item_padding_top_bottom"
-        android:paddingTop="@dimen/feed_item_padding_top_bottom" >
-
-        <LinearLayout
-            android:layout_width="fill_parent"
+        android:gravity="center">
+        <ProgressBar
+            android:id="@+id/loading_news_feed"
+            style="?android:progressBarStyle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingLeft="@dimen/feed_item_padding_left_right"
-            android:paddingRight="@dimen/feed_item_padding_left_right" >
-
-            <ImageView
-                android:id="@+id/profilePic"
-                android:layout_width="@dimen/feed_item_profile_pic"
-                android:layout_height="@dimen/feed_item_profile_pic"
-                android:scaleType="fitCenter"
-                android:src="@drawable/mark_zuckerberg_square">
-            </ImageView>
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingLeft="@dimen/feed_item_profile_info_padd" >
-
-                <TextView
-                    android:id="@+id/name"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/feed_item_profile_name"
-                    android:textStyle="bold"
-                    android:text="Mark Zuckerberg"/>
-
-                <TextView
-                    android:id="@+id/timestamp"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/timestamp"
-                    android:textSize="@dimen/feed_item_timestamp"
-                    android:text="Feb. 20, 2017 4:30pm"/>
-            </LinearLayout>
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/txtStatusMsg"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="5dp"
-            android:paddingLeft="@dimen/feed_item_status_pad_left_right"
-            android:paddingRight="@dimen/feed_item_status_pad_left_right"
-            android:paddingTop="@dimen/feed_item_status_pad_top"
-            android:text="It's so refreshing to poop here. I r8 this 8/8"/>
-
-        <TextView
-            android:id="@+id/txtUrl"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:linksClickable="true"
-            android:paddingBottom="10dp"
-            android:paddingLeft="@dimen/feed_item_status_pad_left_right"
-            android:paddingRight="@dimen/feed_item_status_pad_left_right"
-            android:textColorLink="@color/link" />
-
-        <ImageView
-            android:id="@+id/feedImage1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:scaleType="fitXY"
+            android:layout_gravity="center"
             android:visibility="visible"
-            android:src="@drawable/cr_sample"/>
+            />
     </LinearLayout>
-
 </LinearLayout>

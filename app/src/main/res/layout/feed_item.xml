@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@color/feed_bg"
     android:orientation="vertical" >
 
@@ -12,10 +12,11 @@
         android:layout_marginLeft="@dimen/feed_item_margin"
         android:layout_marginRight="@dimen/feed_item_margin"
         android:layout_marginTop="@dimen/feed_item_margin"
+        android:layout_marginBottom="@dimen/feed_item_margin"
         android:background="@drawable/bg_news_feed_roundcorner"
         android:orientation="vertical"
         android:paddingBottom="@dimen/feed_item_padding_top_bottom"
-        android:paddingTop="@dimen/feed_item_padding_top_bottom" >
+        android:paddingTop="@dimen/feed_item_padding_top_bottom">
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -25,7 +26,7 @@
             android:paddingRight="@dimen/feed_item_padding_left_right" >
 
             <ImageView
-                android:id="@+id/profilePic"
+                android:id="@+id/postProfilePic"
                 android:layout_width="@dimen/feed_item_profile_pic"
                 android:layout_height="@dimen/feed_item_profile_pic"
                 android:scaleType="fitCenter"
@@ -39,7 +40,7 @@
                 android:paddingLeft="@dimen/feed_item_profile_info_padd" >
 
                 <TextView
-                    android:id="@+id/name"
+                    android:id="@+id/post_name"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/feed_item_profile_name"
@@ -47,7 +48,7 @@
                     android:text="Mark Zuckerberg"/>
 
                 <TextView
-                    android:id="@+id/timestamp"
+                    android:id="@+id/post_date"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/timestamp"
@@ -66,24 +67,25 @@
             android:paddingTop="@dimen/feed_item_status_pad_top"
             android:text="It's so refreshing to poop here. I r8 this 8/8"/>
 
-        <TextView
-            android:id="@+id/txtUrl"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:linksClickable="true"
-            android:paddingBottom="10dp"
-            android:paddingLeft="@dimen/feed_item_status_pad_left_right"
-            android:paddingRight="@dimen/feed_item_status_pad_left_right"
-            android:textColorLink="@color/link" />
+        <!--<TextView-->
+            <!--android:id="@+id/txtUrl"-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:linksClickable="true"-->
+            <!--android:paddingBottom="10dp"-->
+            <!--android:paddingLeft="@dimen/feed_item_status_pad_left_right"-->
+            <!--android:paddingRight="@dimen/feed_item_status_pad_left_right"-->
+            <!--android:textColorLink="@color/link" />-->
 
         <ImageView
-            android:id="@+id/feedImage1"
+            android:id="@+id/post_image"
+            android:adjustViewBounds="true"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="250dp"
             android:background="@color/white"
-            android:scaleType="fitXY"
-            android:visibility="visible"
-            android:src="@drawable/cr_sample"/>
+            android:scaleType="centerCrop"
+            android:visibility="visible">
+        </ImageView>
     </LinearLayout>
 
 </LinearLayout>

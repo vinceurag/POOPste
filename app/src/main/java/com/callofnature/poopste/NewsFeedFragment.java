@@ -4,9 +4,28 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+
+import com.callofnature.poopste.adapters.FeedAdapter;
+import com.callofnature.poopste.helpers.PoopsteApi;
+import com.callofnature.poopste.model.Feed;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
 
 
 /**
@@ -33,6 +52,15 @@ public class NewsFeedFragment extends Fragment {
         // Required empty public constructor
     }
 
+    //for posts
+    private List<Feed> posts = new ArrayList<>();
+    private RecyclerView recyclerView;
+    private FeedAdapter fAdapter;
+    JSONArray jsonPosts;
+    Feed post;
+    ProgressBar loadingCircle;
+    SwipeRefreshLayout swipeRefreshLayout;
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -54,10 +82,9 @@ public class NewsFeedFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
+
+        prepareFeedData();
     }
 
     @Override
@@ -65,7 +92,22 @@ public class NewsFeedFragment extends Fragment {
                              Bundle savedInstanceState) {
         ((MainActivity)getActivity()).setActionBarTitle("News Feed");
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_news_feed, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_news_feed, container, false);
+        swipeRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorPrimary), getResources().getColor(R.color.colorAccent), getResources().getColor(R.color.accepted));
+
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
+        loadingCircle = (ProgressBar) rootView.findViewById(R.id.loading_news_feed);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshContent(rootView);
+
+            }
+        });
+
+
+        return rootView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -75,6 +117,58 @@ public class NewsFeedFragment extends Fragment {
         }
     }
 
+    public void clear() {
+        int size = this.posts.size();
+        this.posts.clear();
+    }
+
+    private void prepareFeedData() {
+        posts.clear();
+        PoopsteApi.getWithHeader("posts", new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                Log.d("Success", "API call is successful");
+                try {
+                    String response = new String(responseBody, "UTF-8");
+                    JSONObject obj = new JSONObject(response);
+                    jsonPosts = obj.getJSONArray("data");
+                    fAdapter = new FeedAdapter(posts);
+                    RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+                    recyclerView.setLayoutManager(mLayoutManager);
+                    recyclerView.setItemAnimator(new DefaultItemAnimator());
+                    recyclerView.setAdapter(fAdapter);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    swipeRefreshLayout.setVisibility(View.VISIBLE);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                for(int i = 0; i < jsonPosts.length(); i++) {
+                    try {
+                        JSONObject objPost = jsonPosts.getJSONObject(i);
+                        post = new Feed(objPost.getString("fullname"), objPost.getString("status"), objPost.getString("profile_pic"), objPost.getString("photo"));
+                        posts.add(post);
+                        Log.d("Status", objPost.getString("fullname"));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+                swipeRefreshLayout.setRefreshing(false);
+
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Log.e("FAILED", "API call has failed");
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+    }
+
+    private void refreshContent(final View rootView){
+        prepareFeedData();
+    }
 
     @Override
     public void onDetach() {

@@ -1,26 +1,24 @@
 package com.callofnature.poopste;
 
-import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -41,10 +39,8 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -164,6 +160,7 @@ public class NewPostActivity extends AppCompatActivity {
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
 
             picturePath = cursor.getString(columnIndex);
+
             fileToUpload = new File(picturePath);
             Log.d("path", picturePath);
 
@@ -227,6 +224,10 @@ public class NewPostActivity extends AppCompatActivity {
             finish();
             return true;
         } else if(id == 777) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (null != getCurrentFocus())
+                imm.hideSoftInputFromWindow(getCurrentFocus()
+                        .getApplicationWindowToken(), 0);
             postStatus();
         }
         return super.onOptionsItemSelected(item);
@@ -272,6 +273,7 @@ public class NewPostActivity extends AppCompatActivity {
     }
 
     public void sendDataToApi() {
+
         try {
             JSONObject jsonParams = new JSONObject();
             jsonParams.put("status", msg_status);

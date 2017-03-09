@@ -27,6 +27,11 @@ public class PoopsteApi {
         client.post(null, getAbsoluteUrl(url), params, "application/json", responseHandler);
     }
 
+    public static void getWithHeader(String url, AsyncHttpResponseHandler responseHandler) {
+        client.addHeader("Authorization", "Bearer " + Model.getToken());
+        client.get(getAbsoluteUrl(url), responseHandler);
+    }
+
     private static String getAbsoluteUrl(String relativeUrl) {
         return BASE_URL + relativeUrl;
     }

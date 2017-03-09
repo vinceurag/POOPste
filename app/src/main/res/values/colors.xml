@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#E64A19</color>
     <color name="colorAccent">#795548</color>
     <color name="white">#FFFFFF</color>
+    <color name="accepted">#00B16A</color>
 
     <color name="feed_bg">#d3d6db</color>
     <color name="feed_item_bg">#ffffff</color>
