@@ -52,6 +52,7 @@ public class NearbyThronesFragment extends Fragment {
         // Inflate the layout for this fragment
         ((MainActivity)getActivity()).setActionBarTitle("Nearby Thrones");
         rootView = inflater.inflate(R.layout.fragment_nearby_thrones, container, false);
+
         mLayout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
         mLayout.setAnchorPoint(0.5f);
         mLayout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);

@@ -20,7 +20,8 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:scrollbars="vertical"
-            android:divider="@null"/>
+            android:divider="@null"
+            android:visibility="gone"/>
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <LinearLayout android:orientation="vertical"
@@ -36,4 +37,5 @@
             android:visibility="visible"
             />
     </LinearLayout>
+
 </LinearLayout>

@@ -1,8 +1,9 @@
 package com.callofnature.poopste;
 
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -18,6 +19,7 @@ import android.widget.ProgressBar;
 
 import com.callofnature.poopste.adapters.FeedAdapter;
 import com.callofnature.poopste.helpers.NetworkConnection;
+import com.callofnature.poopste.helpers.OnLoadMoreListener;
 import com.callofnature.poopste.helpers.PoopsteApi;
 import com.callofnature.poopste.model.Feed;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -66,11 +68,16 @@ public class NewsFeedFragment extends Fragment {
     ProgressBar loadingCircle;
     SwipeRefreshLayout swipeRefreshLayout;
 
+    public static int pageNumber;
+    Handler handler;
+
+
     SimpleDateFormat sdfDate;
     String posting_date;
     String strDate;
 
     private View rootView;
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -100,24 +107,22 @@ public class NewsFeedFragment extends Fragment {
         swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorPrimary), getResources().getColor(R.color.colorAccent), getResources().getColor(R.color.accepted));
 
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.getRecycledViewPool().setMaxRecycledViews(0, 0);
+        fAdapter = new FeedAdapter(posts, recyclerView);
         loadingCircle = (ProgressBar) rootView.findViewById(R.id.loading_news_feed);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                refreshContent(rootView);
+        loadingCircle.setVisibility(View.VISIBLE);
 
-            }
-        });
+        handler = new Handler();
+        pageNumber = 0;
 
-        return rootView;
-    }
-
-    @Override
-    public void onStart(){
-        super.onStart();
         if(NetworkConnection.isConnectedToNetwork(getActivity().getApplicationContext()))
         {
+            recyclerView.setAdapter(fAdapter);
             prepareFeedData();
+
         }
         else
         {
@@ -137,6 +142,41 @@ public class NewsFeedFragment extends Fragment {
             mySnackbar.setActionTextColor(getResources().getColor(R.color.colorPrimary));
             mySnackbar.show();
         }
+
+        fAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                posts.add(null);
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        fAdapter.notifyItemInserted(posts.size() - 1);
+
+                    }
+                });
+                pageNumber += 5;
+
+                prepareFeedData();
+
+            }
+        });
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshContent(rootView);
+
+            }
+        });
+
+        return rootView;
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        loadingCircle.setVisibility(View.VISIBLE);
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -152,8 +192,8 @@ public class NewsFeedFragment extends Fragment {
     }
 
     private void prepareFeedData() {
-        posts.clear();
-        PoopsteApi.getWithHeader("posts", new AsyncHttpResponseHandler() {
+
+        PoopsteApi.getWithHeader("posts/" + pageNumber, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 Log.d("Success", "API call is successful");
@@ -161,35 +201,50 @@ public class NewsFeedFragment extends Fragment {
                     String response = new String(responseBody, "UTF-8");
                     JSONObject obj = new JSONObject(response);
                     jsonPosts = obj.getJSONArray("data");
-                    fAdapter = new FeedAdapter(posts);
-                    RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
-                    recyclerView.setLayoutManager(mLayoutManager);
-                    recyclerView.setItemAnimator(new DefaultItemAnimator());
-                    recyclerView.setAdapter(fAdapter);
-                    recyclerView.setVisibility(View.VISIBLE);
-                    swipeRefreshLayout.setVisibility(View.VISIBLE);
+
+
+
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                for(int i = 0; i < jsonPosts.length(); i++) {
-                    try {
-                        JSONObject objPost = jsonPosts.getJSONObject(i);
-                        String dateStr = objPost.getString("date_created");
-                        Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(dateStr);
-                        sdfDate = new SimpleDateFormat("MMM. dd, yyyy hh:mm aaa");//dd/MM/yyyy
-                        posting_date = sdfDate.format(date);
+                if(jsonPosts != null) {
 
-                        post = new Feed(objPost.getString("fullname"), objPost.getString("status"), objPost.getString("profile_pic"), objPost.getString("photo"), posting_date);
-                        posts.add(post);
+                    if(pageNumber > 0) {
+                        posts.remove(posts.size() - 1);
+                        fAdapter.notifyItemRemoved(posts.size());
 
-                        Log.d("Status", strDate.getClass().getName());
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
+                    for (int i = 0; i < jsonPosts.length(); i++) {
+                        try {
+                            JSONObject objPost = jsonPosts.getJSONObject(i);
+                            String dateStr = objPost.getString("date_created");
+                            Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(dateStr);
+                            sdfDate = new SimpleDateFormat("MMM. dd, yyyy hh:mm aaa");//dd/MM/yyyy
+                            posting_date = sdfDate.format(date);
 
+                            post = new Feed(objPost.getString("fullname"), objPost.getString("status"), objPost.getString("profile_pic"), objPost.getString("photo"), posting_date);
+                            posts.add(post);
+
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    fAdapter.notifyItemInserted(posts.size());
+                                }
+                            });
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                    loadingCircle.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    swipeRefreshLayout.setVisibility(View.VISIBLE);
+
+                    swipeRefreshLayout.setRefreshing(false);
+                    fAdapter.setLoaded();
                 }
 
-                swipeRefreshLayout.setRefreshing(false);
 
             }
 
