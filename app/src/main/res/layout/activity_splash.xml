@@ -5,20 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
-    android:background="@color/splash"
+    android:background="@color/colorPrimary"
     tools:context="com.callofnature.poopste.SplashActivity">
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="495dp"
-        android:orientation="vertical"
-        tools:layout_editor_absoluteY="8dp"
-        tools:layout_editor_absoluteX="8dp">
+        android:orientation="vertical">
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:srcCompat="@drawable/poopste_splash"
+            app:srcCompat="@drawable/poopste_green"
             android:id="@+id/imageView3" />
 
     </LinearLayout>

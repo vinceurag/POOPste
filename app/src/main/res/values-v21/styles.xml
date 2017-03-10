@@ -5,9 +5,12 @@
         <item name="windowNoTitle">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="colorControlNormal">@color/textHintColor</item>
+        <item name="colorControlActivated">@color/colorAccent</item>
+        <item name="colorControlHighlight">@color/textHintColor</item>
     </style>
     
     <style name="SplashTheme" parent="AppTheme.NoActionBar">
-        <item name="android:windowBackground">@color/splash</item>
+        <item name="android:windowBackground">@color/colorPrimaryDark</item>
     </style>
 </resources>
