@@ -17,10 +17,10 @@
         <com.sothree.slidinguppanel.SlidingUpPanelLayout
             xmlns:sothree="http://schemas.android.com/apk/res-auto"
             android:id="@+id/sliding_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:gravity="bottom"
-            sothree:umanoPanelHeight="68dp"
+            sothree:umanoPanelHeight="40dp"
             sothree:umanoShadowHeight="4dp">
 
             <com.google.android.gms.maps.MapView
@@ -30,87 +30,101 @@
                 android:gravity="center"
                 android:layout_weight="1"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="top|center"
-                android:id="@+id/linLay"
-                android:layout_marginRight="@dimen/feed_item_margin"
-                android:layout_marginTop="@dimen/feed_item_margin"
-                android:background="@drawable/bg_news_feed_roundcorner"
-                android:orientation="vertical"
-                android:paddingBottom="@dimen/feed_item_padding_top_bottom"
-                android:paddingTop="@dimen/feed_item_padding_top_bottom">
+        <LinearLayout
+            android:id="@+id/linLay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginRight="@dimen/feed_item_margin"
+            android:background="@drawable/bg_news_feed_roundcorner"
+            android:gravity="top|center"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/feed_item_padding_top_bottom">
 
-                <LinearLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingLeft="@dimen/feed_item_padding_left_right"
-                    android:paddingRight="@dimen/feed_item_padding_left_right"
-                    android:weightSum="1">
-
-                    <ImageView
-                        android:id="@+id/profilePic"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:scaleType="fitCenter"
-                        android:src="@drawable/nav_nearby">
-                    </ImageView>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingLeft="@dimen/feed_item_profile_info_padd" >
-
-                        <TextView
-                            android:id="@+id/name"
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="@dimen/feed_item_profile_name"
-                            android:textStyle="bold"
-                            android:text="Starbucks, P. Noval"/>
-
-                        <TextView
-                            android:id="@+id/timestamp"
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/timestamp"
-                            android:textSize="@dimen/feed_item_timestamp"
-                            android:text="Features: Bidet | Tissue | Soap"/>
-                    </LinearLayout>
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="right"
-                        android:gravity="right">
-                        <RatingBar
-                            android:layout_width="wrap_content"
-                            android:layout_height="20dp"
-                            android:id="@+id/ratingBar"
-                            android:isIndicator="true"
-                            style="?android:attr/ratingBarStyleSmall"
-                            android:numStars="5"
-                            android:rating="3"
-                            android:stepSize="0.1"
-                            android:layout_gravity="right"
-                            />
-                    </LinearLayout>
-                </LinearLayout>
+            <ImageView
+                android:id="@+id/arrowUp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_up"
+                android:layout_marginTop="@dimen/nearby_arrow_margin_top"
+                android:layout_marginBottom="@dimen/nearby_arrow_margin_bottom" />
 
 
-                <TextView
-                    android:id="@+id/txtUrl"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:linksClickable="true"
-                    android:paddingBottom="10dp"
-                    android:paddingLeft="@dimen/feed_item_status_pad_left_right"
-                    android:paddingRight="@dimen/feed_item_status_pad_left_right"
-                    android:textColorLink="@color/link" />
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view_nearby"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scrollbars="vertical" />
 
-            </LinearLayout>
+            <!--<LinearLayout-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:paddingLeft="@dimen/feed_item_padding_left_right"-->
+            <!--android:paddingRight="@dimen/feed_item_padding_left_right"-->
+            <!--android:weightSum="1">-->
+
+            <!--<ImageView-->
+            <!--android:id="@+id/profilePic"-->
+            <!--android:layout_width="30dp"-->
+            <!--android:layout_height="30dp"-->
+            <!--android:scaleType="fitCenter"-->
+            <!--android:src="@drawable/nav_nearby">-->
+            <!--</ImageView>-->
+
+            <!--<LinearLayout-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="vertical"-->
+            <!--android:paddingLeft="@dimen/feed_item_profile_info_padd" >-->
+
+            <!--<TextView-->
+            <!--android:id="@+id/name"-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textSize="@dimen/feed_item_profile_name"-->
+            <!--android:textStyle="bold"-->
+            <!--android:text="Starbucks, P. Noval"/>-->
+
+            <!--<TextView-->
+            <!--android:id="@+id/timestamp"-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textColor="@color/timestamp"-->
+            <!--android:textSize="@dimen/feed_item_timestamp"-->
+            <!--android:text="Features: Bidet | Tissue | Soap"/>-->
+            <!--</LinearLayout>-->
+            <!--<LinearLayout-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_gravity="right"-->
+            <!--android:gravity="right">-->
+            <!--<RatingBar-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="20dp"-->
+            <!--android:id="@+id/ratingBar"-->
+            <!--android:isIndicator="true"-->
+            <!--style="?android:attr/ratingBarStyleSmall"-->
+            <!--android:numStars="5"-->
+            <!--android:rating="3"-->
+            <!--android:stepSize="0.1"-->
+            <!--android:layout_gravity="right"-->
+            <!--/>-->
+            <!--</LinearLayout>-->
+            <!--</LinearLayout>-->
+
+
+            <!--<TextView-->
+            <!--android:id="@+id/txtUrl"-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:linksClickable="true"-->
+            <!--android:paddingBottom="10dp"-->
+            <!--android:paddingLeft="@dimen/feed_item_status_pad_left_right"-->
+            <!--android:paddingRight="@dimen/feed_item_status_pad_left_right"-->
+            <!--android:textColorLink="@color/link" />-->
+
+        </LinearLayout>
         </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
     </LinearLayout>
