@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
@@ -149,6 +150,7 @@ public class MainActivity extends AppCompatActivity
             fragmentTransaction.commit();
         } else if (id == R.id.nav_nearby) {
             NearbyThronesFragment nearbyThrones = new NearbyThronesFragment();
+            FragmentManager fragMan = getSupportFragmentManager();
             android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.mainFrame, nearbyThrones);
             fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);

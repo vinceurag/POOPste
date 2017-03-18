@@ -12,7 +12,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/poopste_tri_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
@@ -28,7 +28,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBONjj_Pw-WY2l-hHs_nDnx0tYTxoK44zs" />
+            android:value="AIzaSyBjNrKtQhnyPN7n_Cv9Uvb3va4h3Wtn3XU" />
 
         <activity android:name=".RegisterActivity" />
 

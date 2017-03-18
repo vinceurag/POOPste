@@ -3,9 +3,23 @@ package com.callofnature.poopste;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -13,14 +27,19 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.callofnature.poopste.adapters.NearbyAdapter;
 import com.callofnature.poopste.helpers.NetworkConnection;
+import com.callofnature.poopste.helpers.PoopsteApi;
+import com.callofnature.poopste.model.Feed;
 import com.callofnature.poopste.model.Nearby;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -29,20 +48,30 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.entity.StringEntity;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.READ_CONTACTS;
+import static android.content.Context.LOCATION_SERVICE;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class NearbyThronesFragment extends Fragment {
+public class NearbyThronesFragment extends Fragment implements com.google.android.gms.location.LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     MapView mMapView;
     private GoogleMap googleMap;
@@ -55,6 +84,8 @@ public class NearbyThronesFragment extends Fragment {
     private RecyclerView recyclerView;
     private NearbyAdapter nAdapter;
     private ImageView icon;
+    GoogleApiClient mGoogleApiClient;
+    Location mLastLocation;
 
     public NearbyThronesFragment() {
         // Required empty public constructor
@@ -65,7 +96,7 @@ public class NearbyThronesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        ((MainActivity)getActivity()).setActionBarTitle("Nearby Thrones");
+        ((MainActivity) getActivity()).setActionBarTitle("Nearby Thrones");
         rootView = inflater.inflate(R.layout.fragment_nearby_thrones, container, false);
 
         mLayout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
@@ -85,17 +116,17 @@ public class NearbyThronesFragment extends Fragment {
         recyclerView.getRecycledViewPool().setMaxRecycledViews(0, 0);
 
         recyclerView.setAdapter(nAdapter);
-        prepareNearbyData();
+
 
         mLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
-            public void onPanelSlide(View panel, float slideOffset) { /** DO NOTHING **/ }
+            public void onPanelSlide(View panel, float slideOffset) { /** DO NOTHING **/}
 
             @Override
             public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
-                if(newState == SlidingUpPanelLayout.PanelState.EXPANDED) {
+                if (newState == SlidingUpPanelLayout.PanelState.EXPANDED) {
                     icon.setImageResource(R.drawable.ic_down);
-                } else if(newState == SlidingUpPanelLayout.PanelState.COLLAPSED || newState == SlidingUpPanelLayout.PanelState.ANCHORED) {
+                } else if (newState == SlidingUpPanelLayout.PanelState.COLLAPSED || newState == SlidingUpPanelLayout.PanelState.ANCHORED) {
                     icon.setImageResource(R.drawable.ic_up);
                 }
             }
@@ -117,9 +148,9 @@ public class NearbyThronesFragment extends Fragment {
             @Override
             public void onMapReady(GoogleMap mMap) {
                 googleMap = mMap;
+                googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
-
-                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission((Activity) getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission((Activity) getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
                     //    ActivityCompat#requestPermissions
                     // here to request the missing permissions, and then overriding
@@ -130,14 +161,54 @@ public class NearbyThronesFragment extends Fragment {
                     return;
                 }
                 googleMap.setMyLocationEnabled(true);
-
                 // For dropping a marker at a point on the Map
-                LatLng pnoval = new LatLng(14.607724, 120.988953);
-                googleMap.addMarker(new MarkerOptions().position(pnoval).title("Marker Title").snippet("Marker Description"));
+                LocationManager locationManager = (LocationManager) getActivity().getSystemService(getActivity().LOCATION_SERVICE);
+                Criteria criteria = new Criteria();
+                String bestProvider = locationManager.getBestProvider(criteria, true);
+                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
+                Location location = locationManager.getLastKnownLocation(bestProvider);
+                if (location != null) {
+                    onLocationChanged(location);
+                }
+                locationManager.requestLocationUpdates(bestProvider, 300000, 0, new android.location.LocationListener() {
+                    @Override
+                    public void onLocationChanged(Location location) {
+                        Log.d("HOY", "Calling API...");
+                        prepareNearbyData(location.getLatitude(), location.getLongitude());
+                        LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
 
-                // For zooming automatically to the location of the marker
-                CameraPosition cameraPosition = new CameraPosition.Builder().target(pnoval).zoom(15).build();
-                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                        // For zooming automatically to the location of the marker
+                        CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
+                        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+                        Log.e("MYLOC", "I am at " + location.getLatitude());
+                    }
+
+                    @Override
+                    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+                    }
+
+                    @Override
+                    public void onProviderEnabled(String provider) {
+
+                    }
+
+                    @Override
+                    public void onProviderDisabled(String provider) {
+
+                    }
+                });
+
             }
         });
 
@@ -145,19 +216,59 @@ public class NearbyThronesFragment extends Fragment {
     }
 
     @Override
-    public void onStart(){
-        super.onStart();
-        if(NetworkConnection.isConnectedToNetwork(getActivity().getApplicationContext()))
-        {
-            
+    public void onResume() {
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
         }
-        else
-        {
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+            mLastLocation.getLatitude();
+            mLastLocation.getLongitude();
+
+            Log.d("HOY", "Calling API...");
+            prepareNearbyData(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            LatLng loc = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+
+            // For zooming automatically to the location of the marker
+            CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
+            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+            Log.e("MYLOC", "I am at " + mLastLocation.getLatitude());
+        }
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    public void onStart() {
+        mGoogleApiClient = new GoogleApiClient.Builder(getContext())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        mGoogleApiClient.connect();
+        super.onStart();
+        if (NetworkConnection.isConnectedToNetwork(getActivity().getApplicationContext())) {
+
+        } else {
             Snackbar mySnackbar = Snackbar
-                    .make(getView(),"Not connected to a network.", Snackbar.LENGTH_INDEFINITE)
-                    .setAction("Retry", new View.OnClickListener(){
+                    .make(getView(), "Not connected to a network.", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Retry", new View.OnClickListener() {
                         @Override
-                        public void onClick(View view){
+                        public void onClick(View view) {
                             NearbyThronesFragment nearbyThrones = new NearbyThronesFragment();
                             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                             fragmentTransaction.add(nearbyThrones, "Nearby Thrones")
@@ -192,36 +303,105 @@ public class NearbyThronesFragment extends Fragment {
         return false;
     }
 
-    public void prepareNearbyData(){
-        Nearby nearby = new Nearby("P. Noval", "0.5km", 1);
-        nearbyList.add(nearby);
+    public void prepareNearbyData(double posLat, double posLong) {
+        googleMap.clear();
+        try {
+            JSONObject jsonParams = new JSONObject();
+            jsonParams.put("lat", posLat);
+            jsonParams.put("long", posLong);
+            StringEntity entity = new StringEntity(jsonParams.toString());
 
-        nearby = new Nearby("3rd Floor Engineering", "10km", 4);
-        nearbyList.add(nearby);
+            PoopsteApi.postWithHeader("thrones/", entity, new AsyncHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                    nAdapter.clear();
+                    Log.d("Success", "API call is successful");
+                    try {
+                        String response = new String(responseBody, "UTF-8");
+                        JSONArray jsonPosts = new JSONArray(response);
 
-        nearby = new Nearby("Mcdonalds P. Noval", "5km", 3);
-        nearbyList.add(nearby);
+                        if (jsonPosts != null) {
 
-        nearby = new Nearby("P. Noval Church", "1km", 5);
-        nearbyList.add(nearby);
+                            for (int i = 0; i < jsonPosts.length(); i++) {
+                                try {
+                                    JSONObject objPost = jsonPosts.getJSONObject(i);
 
-        nearby = new Nearby("BGPOP", "1km", 5);
-        nearbyList.add(nearby);
+                                    Nearby nearby = new Nearby(objPost.getString("place_name"), objPost.getString("distance") + "km", (float) objPost.getDouble("rating"));
+                                    nearbyList.add(nearby);
+                                    LatLng markPos = new LatLng(Double.parseDouble(objPost.getString("latitude")), Double.parseDouble(objPost.getString("longitude")));
+                                    MarkerOptions marker = new MarkerOptions().position(markPos).title(objPost.getString("place_name"));
+                                    googleMap.addMarker(marker);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
 
-        nearby = new Nearby("Arki", "1km", 3);
-        nearbyList.add(nearby);
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                    Log.e("FAILED", "API call has failed");
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        nearby = new Nearby("Commerce", "1km", 3);
-        nearbyList.add(nearby);
+        nAdapter.notifyDataSetChanged();
 
-        nearby = new Nearby("Educ", "1km", 4);
-        nearbyList.add(nearby);
-
-        nearby = new Nearby("Arts and Leters", "1km", 3);
-        nearbyList.add(nearby);
-
-        nearby = new Nearby("Nursing", "1km", 2);
-        nearbyList.add(nearby);
     }
 
+    @Override
+    public void onLocationChanged(Location location) {
+        prepareNearbyData(location.getLatitude(), location.getLongitude());
+        LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
+        googleMap.addMarker(new MarkerOptions().position(loc).title("I AM HERE").snippet("current_pos"));
+
+        // For zooming automatically to the location of the marker
+        CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+            mLastLocation.getLatitude();
+            mLastLocation.getLongitude();
+
+            Log.d("HOY", "Calling API...");
+            prepareNearbyData(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            LatLng loc = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+
+            // For zooming automatically to the location of the marker
+            CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
+            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+            Log.e("MYLOC", "I am at " + mLastLocation.getLatitude());
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
 }

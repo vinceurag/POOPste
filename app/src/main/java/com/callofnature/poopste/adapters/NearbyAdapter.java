@@ -58,4 +58,10 @@ public class NearbyAdapter extends RecyclerView.Adapter<NearbyAdapter.MyViewHold
     public int getItemCount(){
         return nearbyList.size();
     }
+
+    public void clear() {
+        int size = this.nearbyList.size();
+        this.nearbyList.clear();
+        notifyItemRangeRemoved(0, size);
+    }
 }

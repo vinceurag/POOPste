@@ -34,17 +34,17 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <ImageView
-                android:layout_width="250dp"
-                android:layout_height="50dp"
-                app:srcCompat="@drawable/poopste_logo_white"
-                android:layout_gravity="center"
-                android:id="@+id/imageView3" />
+            <!--<ImageView-->
+                <!--android:layout_width="250dp"-->
+                <!--android:layout_height="50dp"-->
+                <!--app:srcCompat="@drawable/poopste_logo_white"-->
+                <!--android:layout_gravity="center"-->
+                <!--android:id="@+id/imageView3" />-->
 
             <ImageView
                 android:layout_width="185dp"
-                android:layout_height="181dp"
-                app:srcCompat="@drawable/poopste_white"
+                android:layout_height="185dp"
+                app:srcCompat="@drawable/login"
                 android:layout_gravity="center"
                 android:id="@+id/imageView" />
 
