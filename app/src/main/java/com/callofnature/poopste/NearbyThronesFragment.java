@@ -15,6 +15,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 
 import android.location.LocationManager;
+import android.net.Network;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -261,11 +262,9 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
                 .build();
         mGoogleApiClient.connect();
         super.onStart();
-        if (NetworkConnection.isConnectedToNetwork(getActivity().getApplicationContext())) {
-
-        } else {
+        if(!(NetworkConnection.isConnectedToNetwork(getActivity().getApplicationContext())) && !(NetworkConnection.isLocationServiceEnabled(getActivity().getApplicationContext()))){
             Snackbar mySnackbar = Snackbar
-                    .make(getView(), "Not connected to a network.", Snackbar.LENGTH_INDEFINITE)
+                    .make(getView(), "Not connected to a network and no location services.", Snackbar.LENGTH_INDEFINITE)
                     .setAction("Retry", new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -276,9 +275,48 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
                                     .commit();
                         }
                     });
-            mySnackbar.setActionTextColor(getResources().getColor(R.color.colorPrimary));
+            mySnackbar.setActionTextColor(getResources().getColor(R.color.white));
             mySnackbar.show();
+        }else{
+            if (NetworkConnection.isConnectedToNetwork(getActivity().getApplicationContext())) {
+
+                if(NetworkConnection.isLocationServiceEnabled(getActivity().getApplicationContext())){
+
+                }else{
+                    Snackbar mySnackbar = Snackbar
+                            .make(getView(), "No location service.", Snackbar.LENGTH_INDEFINITE)
+                            .setAction("Retry", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    NearbyThronesFragment nearbyThrones = new NearbyThronesFragment();
+                                    FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                                    fragmentTransaction.add(nearbyThrones, "Nearby Thrones")
+                                            .replace(R.id.nearby_thrones, nearbyThrones)
+                                            .commit();
+                                }
+                            });
+                    mySnackbar.setActionTextColor(getResources().getColor(R.color.white));
+                    mySnackbar.show();
+                }
+            } else {
+                Snackbar mySnackbar = Snackbar
+                        .make(getView(), "Not connected to a network.", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("Retry", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                NearbyThronesFragment nearbyThrones = new NearbyThronesFragment();
+                                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                                fragmentTransaction.add(nearbyThrones, "Nearby Thrones")
+                                        .replace(R.id.nearby_thrones, nearbyThrones)
+                                        .commit();
+                            }
+                        });
+                mySnackbar.setActionTextColor(getResources().getColor(R.color.white));
+                mySnackbar.show();
+            }
         }
+
+
     }
 
     public boolean mayRequestLocation() {

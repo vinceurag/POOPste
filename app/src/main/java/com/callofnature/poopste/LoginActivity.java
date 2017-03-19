@@ -320,7 +320,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             signIn();
                         }
                     });
-            mySnackbar.setActionTextColor(getResources().getColor(R.color.colorPrimary));
+            mySnackbar.setActionTextColor(getResources().getColor(R.color.white));
             mySnackbar.show();
         }
     }

@@ -114,34 +114,10 @@ public class NewsFeedFragment extends Fragment {
         fAdapter = new FeedAdapter(posts, recyclerView);
         loadingCircle = (ProgressBar) rootView.findViewById(R.id.loading_news_feed);
         loadingCircle.setVisibility(View.VISIBLE);
+        recyclerView.setAdapter(fAdapter);
 
         handler = new Handler();
         pageNumber = 0;
-
-        if(NetworkConnection.isConnectedToNetwork(getActivity().getApplicationContext()))
-        {
-            recyclerView.setAdapter(fAdapter);
-            prepareFeedData();
-
-        }
-        else
-        {
-            Snackbar mySnackbar = Snackbar
-                    .make(getView(),"Not connected to a network.", Snackbar.LENGTH_INDEFINITE)
-                    .setAction("Retry", new View.OnClickListener(){
-                        @Override
-                        public void onClick(View view){
-                            NewsFeedFragment newsFeed = new NewsFeedFragment();
-                            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                            fragmentTransaction.add(newsFeed, "News Feed")
-                                    .replace(R.id.news_feed, newsFeed)
-                                    .commit();
-                            refreshContent(getView());
-                        }
-                    });
-            mySnackbar.setActionTextColor(getResources().getColor(R.color.colorPrimary));
-            mySnackbar.show();
-        }
 
         fAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
@@ -176,6 +152,28 @@ public class NewsFeedFragment extends Fragment {
     public void onStart(){
         super.onStart();
         loadingCircle.setVisibility(View.VISIBLE);
+
+        if(NetworkConnection.isConnectedToNetwork(getActivity().getApplicationContext())){
+            prepareFeedData();
+
+        }
+        else{
+            Snackbar mySnackbar = Snackbar
+                    .make(getView(),"Not connected to a network.", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Retry", new View.OnClickListener(){
+                        @Override
+                        public void onClick(View view){
+                            NewsFeedFragment newsFeed = new NewsFeedFragment();
+                            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                            fragmentTransaction.add(newsFeed, "News Feed")
+                                    .replace(R.id.news_feed, newsFeed)
+                                    .commit();
+                            refreshContent(getView());
+                        }
+                    });
+            mySnackbar.setActionTextColor(getResources().getColor(R.color.white));
+            mySnackbar.show();
+        }
 
     }
 
@@ -271,7 +269,7 @@ public class NewsFeedFragment extends Fragment {
                             refreshContent(rootView);
                         }
                     });
-            mySnackbar.setActionTextColor(getResources().getColor(R.color.colorPrimary));
+            mySnackbar.setActionTextColor(getResources().getColor(R.color.white));
             mySnackbar.show();
         }
     }
