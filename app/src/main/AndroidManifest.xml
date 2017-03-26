@@ -19,7 +19,7 @@
         <activity
             android:name=".LoginActivity"
             android:label="@string/app_name"
-            android:theme="@style/NoAction"></activity>
+            android:theme="@style/NoAction" />
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
@@ -45,6 +45,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".SelectedThroneActivity"
+            android:label="@string/title_activity_selected_throne"
+            android:theme="@style/NoAction"/>
     </application>
 
 </manifest>

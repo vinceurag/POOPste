@@ -27,4 +27,6 @@
 
     <string name="server_client_id">61145288571-8ndk339ed1nvtau8c5i1pf3ntqvfi66a.apps.googleusercontent.com</string>
     <string name="post">POST</string>
+    <string name="title_activity_selected_nearby_thrones">SelectedNearbyThronesActivity</string>
+    <string name="title_activity_selected_throne">SelectedThroneActivity</string>
 </resources>

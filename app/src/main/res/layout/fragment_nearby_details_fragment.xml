@@ -1,0 +1,40 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/details_fragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.callofnature.poopste.Nearby_details_fragment"
+    android:weightSum="2"
+    android:orientation="vertical"
+    android:background="@color/colorPrimaryDark">
+
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/mapView_details"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:layout_weight="1"/>
+
+    <LinearLayout
+        android:id="@+id/details_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginRight="@dimen/feed_item_margin"
+        android:layout_weight="1"
+        android:background="@color/colorPrimaryDark"
+        android:gravity="top|center"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/feed_item_padding_top_bottom">
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view_details"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/nearby_arrow_margin_bottom"
+            android:layout_marginTop="@dimen/nearby_arrow_margin_top"
+            android:scrollbars="vertical" />
+
+    </LinearLayout>
+
+</LinearLayout>

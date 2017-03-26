@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 
+import com.callofnature.poopste.helpers.RecyclerTouchListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -118,6 +119,19 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
 
         recyclerView.setAdapter(nAdapter);
 
+
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity().getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                Intent i = new Intent(getContext(), SelectedThroneActivity.class);
+                startActivity(i);
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+        }));
 
         mLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
