@@ -19,6 +19,7 @@ import android.location.LocationManager;
 import android.net.Network;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -88,6 +89,7 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
     private ImageView icon;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
+    Handler handler;
 
     public NearbyThronesFragment() {
         // Required empty public constructor
@@ -462,8 +464,18 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
 
                                     LatLng loc = new LatLng(objPost.getDouble("latitude"), objPost.getDouble("longitude"));
 
-                                    Nearby nearby = new Nearby(objPost.getString("place_name"), objPost.getString("distance") + "km", (float) objPost.getDouble("rating"), objPost.getInt("id"), loc);
-                                    nearbyList.add(nearby);
+                                    final Nearby nearby = new Nearby(objPost.getString("place_name"), objPost.getString("distance") + "km", (float) objPost.getDouble("rating"), objPost.getInt("id"), loc);
+                                    if(nearbyList.add(nearby)) {
+                                        Log.e("added", "ADDED to list");
+                                    } else {
+                                        Log.e("notAdded", "not added to list");
+                                    }
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            nAdapter.notifyItemInserted(nearbyList.size());
+                                        }
+                                    });
                                     LatLng markPos = new LatLng(Double.parseDouble(objPost.getString("latitude")), Double.parseDouble(objPost.getString("longitude")));
                                     MarkerOptions marker = new MarkerOptions().position(markPos).title(objPost.getString("place_name"));
                                     googleMap.addMarker(marker);
@@ -486,7 +498,9 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
             e.printStackTrace();
         }
 
-        nAdapter.notifyDataSetChanged();
+
 
     }
+
+
 }
