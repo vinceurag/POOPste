@@ -422,6 +422,8 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
 
             Log.e("MYLOC", "I am at " + mLastLocation.getLatitude());
             nAdapter.notifyDataSetChanged();
+        } else {
+            Toast.makeText(getContext(),"ERROR: no last known location" ,Toast.LENGTH_LONG).show();
         }
     }
 
