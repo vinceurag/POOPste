@@ -106,6 +106,9 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
         mLayout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
         mayRequestLocation();
 
+        mMapView = (MapView) rootView.findViewById(R.id.mapView);
+        mMapView.onCreate(savedInstanceState);
+
 
         //for recycler view
         nAdapter = new NearbyAdapter(nearbyList);
@@ -148,10 +151,8 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
         });
 
 
-        mMapView = (MapView) rootView.findViewById(R.id.mapView);
-        mMapView.onCreate(savedInstanceState);
 
-        mMapView.onResume(); // needed to get the map to display immediately
+
 
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
@@ -198,14 +199,14 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
                     @Override
                     public void onLocationChanged(Location location) {
                         Log.d("HOY", "Calling API...");
-                        prepareNearbyData(location.getLatitude(), location.getLongitude());
-                        LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
-
-                        // For zooming automatically to the location of the marker
-                        CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
-                        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-                        Log.e("MYLOC", "I am at " + location.getLatitude());
+//                        prepareNearbyData(location.getLatitude(), location.getLongitude());
+//                        LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
+//
+//                        // For zooming automatically to the location of the marker
+//                        CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
+//                        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//
+//                        Log.e("MYLOC", "I am at " + location.getLatitude());
                     }
 
                     @Override
@@ -226,6 +227,7 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
 
             }
         });
+        mMapView.onResume(); // needed to get the map to display immediately
 
         return rootView;
     }
@@ -233,32 +235,37 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
     @Override
     public void onResume() {
         super.onResume();
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-        if (mLastLocation != null) {
-            mLastLocation.getLatitude();
-            mLastLocation.getLongitude();
+        Log.e("ONRESUME", "onResume called");
+//        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            // TODO: Consider calling
+//            //    ActivityCompat#requestPermissions
+//            // here to request the missing permissions, and then overriding
+//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//            //                                          int[] grantResults)
+//            // to handle the case where the user grants the permission. See the documentation
+//            // for ActivityCompat#requestPermissions for more details.
+//            return;
+//        }
+//        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+//                mGoogleApiClient);
+//        if (mLastLocation != null) {
+//            mLastLocation.getLatitude();
+//            mLastLocation.getLongitude();
+//
+//            Log.d("HOY", "Calling API...");
+//            prepareNearbyData(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+//            LatLng loc = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+//
+//            // For zooming automatically to the location of the marker
+//            CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
+//            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//
+//            Log.e("MYLOC", "I am at " + mLastLocation.getLatitude());
+//        }
+//
+//        nAdapter.notifyDataSetChanged();
 
-            Log.d("HOY", "Calling API...");
-            prepareNearbyData(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-            LatLng loc = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-
-            // For zooming automatically to the location of the marker
-            CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
-            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-            Log.e("MYLOC", "I am at " + mLastLocation.getLatitude());
-        }
+        mMapView = (MapView) rootView.findViewById(R.id.mapView);
 
     }
 
@@ -331,7 +338,6 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
             }
         }
 
-
     }
 
     public boolean mayRequestLocation() {
@@ -358,6 +364,70 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
             requestPermissions(new String[]{ACCESS_FINE_LOCATION}, REQUEST_LOCATIONS);
         }
         return false;
+    }
+
+
+
+    @Override
+    public void onLocationChanged(Location location) {
+        prepareNearbyData(location.getLatitude(), location.getLongitude());
+        LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
+        googleMap.addMarker(new MarkerOptions().position(loc).title("I AM HERE").snippet("current_pos"));
+
+        // For zooming automatically to the location of the marker
+        CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+        Log.e("onConnected", "onConnected called");
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view_nearby);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.getRecycledViewPool().setMaxRecycledViews(0, 0);
+
+        recyclerView.setAdapter(nAdapter);
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+            mLastLocation.getLatitude();
+            mLastLocation.getLongitude();
+
+            Log.e("onConnected", "Latitude: " + mLastLocation.getLatitude());
+            Log.e("onConnected", "Longitude: " + mLastLocation.getLongitude());
+            prepareNearbyData(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            LatLng loc = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+
+            // For zooming automatically to the location of the marker
+            CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
+            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+            Log.e("MYLOC", "I am at " + mLastLocation.getLatitude());
+            nAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.e("FAILED", "onConnectionFailed called");
     }
 
     public void prepareNearbyData(double posLat, double posLong) {
@@ -408,57 +478,6 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
         }
 
         nAdapter.notifyDataSetChanged();
-
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        prepareNearbyData(location.getLatitude(), location.getLongitude());
-        LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
-        googleMap.addMarker(new MarkerOptions().position(loc).title("I AM HERE").snippet("current_pos"));
-
-        // For zooming automatically to the location of the marker
-        CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
-        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-    }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-        if (mLastLocation != null) {
-            mLastLocation.getLatitude();
-            mLastLocation.getLongitude();
-
-            Log.d("HOY", "Calling API...");
-            prepareNearbyData(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-            LatLng loc = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-
-            // For zooming automatically to the location of the marker
-            CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
-            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-            Log.e("MYLOC", "I am at " + mLastLocation.getLatitude());
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
 }

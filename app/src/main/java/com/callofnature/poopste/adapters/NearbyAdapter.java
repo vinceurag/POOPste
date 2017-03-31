@@ -1,6 +1,7 @@
 package com.callofnature.poopste.adapters;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,6 +53,7 @@ public class NearbyAdapter extends RecyclerView.Adapter<NearbyAdapter.MyViewHold
         holder.name.setText(nearby.getNearbyName());
         holder.distance.setText(nearby.getDistance());
         holder.rating.setRating(nearby.getRating());
+        Log.e("onBindViewHolder", "onBindViewHolder called");
     }
 
     @Override
