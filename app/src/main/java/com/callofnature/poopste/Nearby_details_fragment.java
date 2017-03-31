@@ -2,6 +2,7 @@ package com.callofnature.poopste;
 
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
@@ -143,7 +144,8 @@ public class Nearby_details_fragment extends Fragment {
     }
 
     private void prepareDetailsData() {
-        NearbyDetails nearby_info = new NearbyDetails("Engineering 3rd floor", "5 km", 5);
+        final Bundle args = getArguments();
+        NearbyDetails nearby_info = new NearbyDetails(args.getString("nearby_name"), args.getString("nearby_distance"), args.getFloat("nearby_rating"));
         nearbyDetailsList.add(nearby_info);
 
         nAdapter.notifyDataSetChanged();

@@ -1,5 +1,6 @@
 package com.callofnature.poopste;
 
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -45,10 +46,13 @@ public class SelectedThroneActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        Bundle bundle = getIntent().getExtras();
+
+
         getSupportActionBar().setTitle("Nearby Thrones");
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), bundle);
 
         // Set up the ViewPager with the sections adapter.
         tabLayout = (TabLayout) findViewById(R.id.tabs_nearby_place);
@@ -122,8 +126,11 @@ public class SelectedThroneActivity extends AppCompatActivity {
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        private final Bundle fragmentBundle;
+
+        public SectionsPagerAdapter(FragmentManager fm, Bundle data) {
             super(fm);
+            fragmentBundle = data;
         }
 
         @Override
@@ -131,6 +138,7 @@ public class SelectedThroneActivity extends AppCompatActivity {
             switch (position) {
                 case 0:
                     Nearby_details_fragment details_fragment = new Nearby_details_fragment();
+                    details_fragment.setArguments(this.fragmentBundle);
                     return details_fragment;
                 case 1:
                     Nearby_review_fragment review_fragment = new Nearby_review_fragment();

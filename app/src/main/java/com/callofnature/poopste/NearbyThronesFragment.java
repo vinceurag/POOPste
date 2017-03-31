@@ -127,6 +127,11 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
             @Override
             public void onClick(View view, int position) {
                 Intent i = new Intent(getContext(), SelectedThroneActivity.class);
+                i.putExtra("nearby_id", nearbyList.get(position).getId());
+                i.putExtra("nearby_loc", nearbyList.get(position).getLoc());
+                i.putExtra("nearby_name", nearbyList.get(position).getNearbyName());
+                i.putExtra("nearby_rating", nearbyList.get(position).getRating());
+                i.putExtra("nearby_distance", nearbyList.get(position).getDistance());
                 startActivity(i);
             }
 
@@ -199,14 +204,14 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
                     @Override
                     public void onLocationChanged(Location location) {
                         Log.d("HOY", "Calling API...");
-//                        prepareNearbyData(location.getLatitude(), location.getLongitude());
-//                        LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
-//
-//                        // For zooming automatically to the location of the marker
-//                        CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
-//                        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-//
-//                        Log.e("MYLOC", "I am at " + location.getLatitude());
+                        prepareNearbyData(location.getLatitude(), location.getLongitude());
+                        LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
+
+                        // For zooming automatically to the location of the marker
+                        CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
+                        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+                        Log.e("MYLOC", "I am at " + location.getLatitude());
                     }
 
                     @Override
@@ -453,7 +458,9 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
                                 try {
                                     JSONObject objPost = jsonPosts.getJSONObject(i);
 
-                                    Nearby nearby = new Nearby(objPost.getString("place_name"), objPost.getString("distance") + "km", (float) objPost.getDouble("rating"));
+                                    LatLng loc = new LatLng(objPost.getDouble("latitude"), objPost.getDouble("longitude"));
+
+                                    Nearby nearby = new Nearby(objPost.getString("place_name"), objPost.getString("distance") + "km", (float) objPost.getDouble("rating"), objPost.getInt("id"), loc);
                                     nearbyList.add(nearby);
                                     LatLng markPos = new LatLng(Double.parseDouble(objPost.getString("latitude")), Double.parseDouble(objPost.getString("longitude")));
                                     MarkerOptions marker = new MarkerOptions().position(markPos).title(objPost.getString("place_name"));
