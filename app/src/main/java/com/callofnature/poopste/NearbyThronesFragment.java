@@ -470,12 +470,9 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
                                     } else {
                                         Log.e("notAdded", "not added to list");
                                     }
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            nAdapter.notifyItemInserted(nearbyList.size());
-                                        }
-                                    });
+                                    Log.e("size", "Nearby Thrones: " + nearbyList.size());
+                                    nAdapter.notifyDataSetChanged();
+
                                     LatLng markPos = new LatLng(Double.parseDouble(objPost.getString("latitude")), Double.parseDouble(objPost.getString("longitude")));
                                     MarkerOptions marker = new MarkerOptions().position(markPos).title(objPost.getString("place_name"));
                                     googleMap.addMarker(marker);
