@@ -106,7 +106,7 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
         mLayout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
         mLayout.setAnchorPoint(0.5f);
         mLayout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
-        mayRequestLocation();
+//        mayRequestLocation();
 
         mMapView = (MapView) rootView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
@@ -347,31 +347,31 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
 
     }
 
-    public boolean mayRequestLocation() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true;
-        }
-        //getActivity().checkSelfPermission(ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&  was removed
-        //1 location permission only according to stackoverflow
-        if (getActivity().checkSelfPermission(ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        }
-        //shouldShowRequestPermissionRationale(ACCESS_COARSE_LOCATION) && was removed
-        //1 location permission only according to stackoverflow
-        if (shouldShowRequestPermissionRationale(ACCESS_FINE_LOCATION)) {
-            Snackbar.make(rootView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
-                    .setAction(android.R.string.ok, new View.OnClickListener() {
-                        @Override
-                        @TargetApi(Build.VERSION_CODES.M)
-                        public void onClick(View v) {
-                            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_LOCATIONS);
-                        }
-                    });
-        } else {
-            requestPermissions(new String[]{ACCESS_FINE_LOCATION}, REQUEST_LOCATIONS);
-        }
-        return false;
-    }
+//    public boolean mayRequestLocation() {
+//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+//            return true;
+//        }
+//        //getActivity().checkSelfPermission(ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&  was removed
+//        //1 location permission only according to stackoverflow
+//        if (getActivity().checkSelfPermission(ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+//            return true;
+//        }
+//        //shouldShowRequestPermissionRationale(ACCESS_COARSE_LOCATION) && was removed
+//        //1 location permission only according to stackoverflow
+//        if (shouldShowRequestPermissionRationale(ACCESS_FINE_LOCATION)) {
+//            Snackbar.make(rootView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
+//                    .setAction(android.R.string.ok, new View.OnClickListener() {
+//                        @Override
+//                        @TargetApi(Build.VERSION_CODES.M)
+//                        public void onClick(View v) {
+//                            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_LOCATIONS);
+//                        }
+//                    });
+//        } else {
+//            requestPermissions(new String[]{ACCESS_FINE_LOCATION}, REQUEST_LOCATIONS);
+//        }
+//        return false;
+//    }
 
 
 

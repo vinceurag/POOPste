@@ -58,6 +58,7 @@ import java.util.List;
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
 
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.READ_CONTACTS;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 
@@ -72,6 +73,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private static final int REQUEST_READ_CONTACTS = 0;
     final private int REQUEST_CODE_ASK_PERMISSIONS = 7;
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static final int REQUEST_LOCATIONS = 7;
 
     /**
      * A dummy authentication store containing known user names and passwords.
@@ -143,6 +145,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mProgressView = findViewById(R.id.login_progress);
 
         mayRequestStorage();
+        mayRequestLocation();
     }
 
 
@@ -515,6 +518,32 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     });
         } else {
             requestPermissions(new String[]{READ_EXTERNAL_STORAGE}, REQUEST_EXTERNAL_STORAGE);
+        }
+        return false;
+    }
+
+    public boolean mayRequestLocation() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        }
+        //getActivity().checkSelfPermission(ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&  was removed
+        //1 location permission only according to stackoverflow
+        if (getApplicationContext().checkSelfPermission(ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        }
+        //shouldShowRequestPermissionRationale(ACCESS_COARSE_LOCATION) && was removed
+        //1 location permission only according to stackoverflow
+        if (shouldShowRequestPermissionRationale(ACCESS_FINE_LOCATION)) {
+            Snackbar.make(mLoginFormView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
+                    .setAction(android.R.string.ok, new View.OnClickListener() {
+                        @Override
+                        @TargetApi(Build.VERSION_CODES.M)
+                        public void onClick(View v) {
+                            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_LOCATIONS);
+                        }
+                    });
+        } else {
+            requestPermissions(new String[]{ACCESS_FINE_LOCATION}, REQUEST_LOCATIONS);
         }
         return false;
     }

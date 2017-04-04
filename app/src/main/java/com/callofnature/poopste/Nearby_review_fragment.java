@@ -58,16 +58,9 @@ public class Nearby_review_fragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar mySnackbar = Snackbar
-                        .make(getView(), "Fab for review", Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Close", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-
-                            }
-                        });
-                mySnackbar.setActionTextColor(getResources().getColor(R.color.white));
-                mySnackbar.show();
+                Intent i = new Intent(getContext(), NewReviewActivity.class);
+                Bundle bundle = ActivityOptions.makeCustomAnimation(getContext(), R.anim.pull_up_from_bottom, R.anim.hold).toBundle();
+                startActivity(i, bundle);
             }
         });
 

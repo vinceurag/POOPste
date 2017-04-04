@@ -48,7 +48,8 @@
         <activity
             android:name=".SelectedThroneActivity"
             android:label="@string/title_activity_selected_throne"
-            android:theme="@style/NoAction"/>
+            android:theme="@style/NoAction" />
+        <activity android:name=".NewReviewActivity"></activity>
     </application>
 
 </manifest>

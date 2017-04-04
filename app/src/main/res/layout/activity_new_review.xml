@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/new_review"
+    tools:context="com.callofnature.poopste.NewReviewActivity">
+
+    <LinearLayout
+        android:layout_width="368dp"
+        android:layout_height="495dp"
+        tools:layout_editor_absoluteY="8dp"
+        tools:layout_editor_absoluteX="8dp"
+        android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Writing Review for: "
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="20dp"
+            android:textColor="@color/colorPrimaryDark"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/review_place"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="P. Noval Comfort Room "
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="50dp"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimaryDark"
+            />
+    </LinearLayout>
+
+
+     <LinearLayout
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="10dp">
+
+         <TextView
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_marginTop="10dp"
+             android:layout_marginLeft="5dp"
+             android:text="Rating: "
+             android:textSize="20dp"
+             android:textColor="@color/colorPrimaryDark"/>
+
+         <RatingBar
+             android:layout_width="wrap_content"
+             android:layout_height="50dp"
+             android:progressBackgroundTint="@color/timestamp"
+             android:progressTint="@color/colorAccent"
+             android:secondaryProgressTint="@color/colorAccent"
+             />
+
+     </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/review"
+            android:layout_width="368dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_news_feed_roundcorner"
+            android:ems="10"
+            android:gravity="top"
+            android:hint="How was your stay?"
+            android:inputType="textMultiLine"
+            android:padding="10dp"
+            android:textColor="@color/colorAccent"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="0dp" />
+    </LinearLayout>
+
+
+</LinearLayout>
+
+</android.support.constraint.ConstraintLayout>
