@@ -68,6 +68,8 @@ public class SelectedThroneActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_selected_throne, menu);
+
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         return true;
     }
 
@@ -80,6 +82,9 @@ public class SelectedThroneActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            return true;
+        } else if (id == android.R.id.home) {
+            finish();
             return true;
         }
 

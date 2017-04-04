@@ -5,6 +5,7 @@ import android.*;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -23,6 +24,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.akexorcist.googledirection.DirectionCallback;
+import com.akexorcist.googledirection.GoogleDirection;
+import com.akexorcist.googledirection.model.Direction;
+import com.akexorcist.googledirection.model.Leg;
+import com.akexorcist.googledirection.model.Route;
+import com.akexorcist.googledirection.util.DirectionConverter;
 import com.callofnature.poopste.adapters.NearbyAdapter;
 import com.callofnature.poopste.adapters.NearbyDetailsAdapter;
 import com.callofnature.poopste.helpers.PoopsteApi;
@@ -39,6 +46,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -88,7 +96,6 @@ public class Nearby_details_fragment extends Fragment implements com.google.andr
 
         recyclerView.setAdapter(nAdapter);
 
-        prepareDetailsData();
 
 
         mMapView = (MapView) rootView.findViewById(R.id.mapView_details);
@@ -106,6 +113,8 @@ public class Nearby_details_fragment extends Fragment implements com.google.andr
             public void onMapReady(GoogleMap mMap) {
                 googleMap = mMap;
                 googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+
+
 
                 if (ActivityCompat.checkSelfPermission((Activity) getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission((Activity) getContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
@@ -136,7 +145,7 @@ public class Nearby_details_fragment extends Fragment implements com.google.andr
                 locationManager.requestLocationUpdates(bestProvider, 300000, 0, new android.location.LocationListener() {
                     @Override
                     public void onLocationChanged(Location location) {
-                        prepareNearbyData(location.getLatitude(), location.getLongitude());
+//                        prepareNearbyData(location.getLatitude(), location.getLongitude());
                         LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
                         // For zooming automatically to the location of the marker
                         CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
@@ -167,10 +176,38 @@ public class Nearby_details_fragment extends Fragment implements com.google.andr
         return rootView;
     }
 
-    private void prepareDetailsData() {
+    private void prepareDetailsData(LatLng loc) {
+        googleMap.clear();
         final Bundle args = getArguments();
         NearbyDetails nearby_info = new NearbyDetails(args.getString("nearby_name"), args.getString("nearby_distance"), args.getFloat("nearby_rating"));
         nearbyDetailsList.add(nearby_info);
+        LatLng nearby_pos = args.getParcelable("nearby_loc");
+        MarkerOptions marker = new MarkerOptions().position(nearby_pos).title(args.getString("nearby_name"));
+        googleMap.addMarker(marker);
+
+        String serverKey = "AIzaSyAY-VZ5EJssszD7-3iKEPfbGNblh6EDdx0";
+        LatLng origin = loc;
+        LatLng destination = nearby_pos;
+        GoogleDirection.withServerKey(serverKey)
+                .from(origin)
+                .to(destination)
+                .execute(new DirectionCallback() {
+                    @Override
+                    public void onDirectionSuccess(Direction direction, String rawBody) {
+                        Log.e("SUCC", "Directions successful");
+                        Route route = direction.getRouteList().get(0);
+                        Leg leg = route.getLegList().get(0);
+                        ArrayList<LatLng> directionPositionList = leg.getDirectionPoint();
+                        PolylineOptions polylineOptions = DirectionConverter.createPolyline(getContext(), directionPositionList, 5, Color.RED);
+                        googleMap.addPolyline(polylineOptions);
+                    }
+
+                    @Override
+                    public void onDirectionFailure(Throwable t) {
+                        Log.e("FAILED", "Failed");
+                    }
+                });
+
 
         nAdapter.notifyDataSetChanged();
     }
@@ -291,9 +328,9 @@ public class Nearby_details_fragment extends Fragment implements com.google.andr
 
             Log.e("onConnected", "Latitude: " + mLastLocation.getLatitude());
             Log.e("onConnected", "Longitude: " + mLastLocation.getLongitude());
-            prepareNearbyData(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+//            prepareNearbyData(mLastLocation.getLatitude(), mLastLocation.getLongitude());
             LatLng loc = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-
+            prepareDetailsData(loc);
             // For zooming automatically to the location of the marker
             CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
@@ -314,7 +351,7 @@ public class Nearby_details_fragment extends Fragment implements com.google.andr
 
     @Override
     public void onLocationChanged(Location location) {
-        prepareNearbyData(location.getLatitude(), location.getLongitude());
+//        prepareNearbyData(location.getLatitude(), location.getLongitude());
         LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
         googleMap.addMarker(new MarkerOptions().position(loc).title("I AM HERE").snippet("current_pos"));
 
