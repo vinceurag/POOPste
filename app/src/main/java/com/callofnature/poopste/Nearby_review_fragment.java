@@ -16,7 +16,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.callofnature.poopste.adapters.NearbyDetailsAdapter;
+import com.callofnature.poopste.adapters.NearbyReviewsAdapter;
 import com.callofnature.poopste.model.NearbyDetails;
+import com.callofnature.poopste.model.NearbyReviews;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +34,9 @@ public class Nearby_review_fragment extends Fragment {
         // Required empty public constructor
     }
 
-    private List<NearbyDetails> nearbyDetailsList = new ArrayList<>();
+    private List<NearbyReviews> reviewsList = new ArrayList<>();
     private RecyclerView recyclerView;
-    private NearbyDetailsAdapter nAdapter;
+    private NearbyReviewsAdapter rAdapter;
 
 
     @Override
@@ -44,7 +46,7 @@ public class Nearby_review_fragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_nearby_review_fragment, container, false);
 
         //for recycler view
-        nAdapter = new NearbyDetailsAdapter(nearbyDetailsList);
+        rAdapter = new NearbyReviewsAdapter(reviewsList);
 
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view_reviews);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
@@ -52,7 +54,7 @@ public class Nearby_review_fragment extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.getRecycledViewPool().setMaxRecycledViews(0, 0);
 
-        recyclerView.setAdapter(nAdapter);
+        recyclerView.setAdapter(rAdapter);
 
         FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab_review);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -64,6 +66,18 @@ public class Nearby_review_fragment extends Fragment {
             }
         });
 
+        prepareReviewData();
+
         return rootView;
+    }
+
+    private void prepareReviewData() {
+        NearbyReviews reviews = new NearbyReviews("Vince Edgar Urag", "This place was so great to poop", 5);
+        reviewsList.add(reviews);
+
+        reviews = new NearbyReviews("Paul Patrick Lising","I love it here, so clean", 4);
+        reviewsList.add(reviews);
+
+        rAdapter.notifyDataSetChanged();
     }
 }

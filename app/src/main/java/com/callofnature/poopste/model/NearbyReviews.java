@@ -8,9 +8,9 @@ public class NearbyReviews {
 
     private String username;
     private String content;
-    private String rating;
+    private float rating;
 
-    public NearbyReviews(String username, String content, String rating){
+    public NearbyReviews(String username, String content, float rating){
         this.username = username;
         this.content = content;
         this.rating = rating;
@@ -32,12 +32,13 @@ public class NearbyReviews {
         this.content = content;
     }
 
-    public String getRating() {
+    public float getRating() {
         return rating;
     }
 
-    public void setRating(String rating) {
+    public void setRating(float rating) {
         this.rating = rating;
     }
+
 
 }

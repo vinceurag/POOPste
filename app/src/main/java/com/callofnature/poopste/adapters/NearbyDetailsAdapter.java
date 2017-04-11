@@ -1,8 +1,11 @@
 package com.callofnature.poopste.adapters;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.LayerDrawable;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.callofnature.poopste.MainActivity;
 import com.callofnature.poopste.R;
 import com.callofnature.poopste.model.NearbyDetails;
 
@@ -30,7 +34,6 @@ public class NearbyDetailsAdapter extends RecyclerView.Adapter<NearbyDetailsAdap
 
         public TextView name, distance;
         public RatingBar rating;
-
         public MyViewHolder(View view){
             super(view);
             name = (TextView) view.findViewById(R.id.nearby_name);
@@ -43,10 +46,21 @@ public class NearbyDetailsAdapter extends RecyclerView.Adapter<NearbyDetailsAdap
             been_here_image.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Snackbar snackbar = Snackbar
-                            .make(view, "I've pooped here!", Snackbar.LENGTH_LONG);
-
-                    snackbar.show();
+                    new AlertDialog.Builder(view.getContext())
+                            .setTitle("You've been here?")
+                            .setMessage("Are you sure you've pooped here?")
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    //action here
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            })
+                            .setIcon(R.drawable.details_name_logo)
+                            .show();
                 }
             });
         }
