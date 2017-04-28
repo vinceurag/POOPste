@@ -281,7 +281,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     String googleId = data.getString("google_id");
                                     String fullName = data.getString("fullname");
                                     String profilePic = data.getString("profile_pic");
-                                    int collegeId = data.getInt("college_id");
+                                    int collegeId = Integer.parseInt(data.getString("college_id"));
                                     String token = meta.getString("token");
 
 
