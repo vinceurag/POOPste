@@ -281,13 +281,16 @@ public class RegisterActivity extends AppCompatActivity {
                                     String googleId = data.getString("google_id");
                                     String fullName = data.getString("fullname");
                                     String profilePic = data.getString("profile_pic");
+                                    int collegeId = data.getInt("college_id");
                                     String token = meta.getString("token");
+
 
                                     Model.setUserId(id);
                                     Model.setFullName(fullName);
                                     Model.setGoogleId(googleId);
                                     Model.setProfilePic(profilePic);
                                     Model.setToken(token);
+                                    Model.setCollegeId(collegeId);
 
                                     Toast.makeText(getApplicationContext(), googleId + " - " + fullName, Toast.LENGTH_LONG).show();
                                     Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
