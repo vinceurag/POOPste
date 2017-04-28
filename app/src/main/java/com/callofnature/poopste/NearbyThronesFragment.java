@@ -97,6 +97,8 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
     Location mLastLocation;
     Handler handler;
 
+    LatLng curPos;
+
     public NearbyThronesFragment() {
         // Required empty public constructor
     }
@@ -117,6 +119,7 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
         mMapView = (MapView) rootView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
 
+
         FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab_nearby);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,7 +131,66 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
                         .setView(addLocationName)
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                //action here
+                                try {
+                                    JSONObject jsonParams = new JSONObject();
+                                    jsonParams.put("place_name", addLocationName.getText().toString());
+                                    jsonParams.put("latitude", curPos.latitude);
+                                    jsonParams.put("longitude", curPos.longitude);
+                                    StringEntity entity = new StringEntity(jsonParams.toString());
+                                    PoopsteApi.postWithHeader("thrones/new", entity, new AsyncHttpResponseHandler() {
+                                        @Override
+                                        public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                                           try {
+                                               String response = new String(responseBody, "UTF-8");
+                                               JSONObject obj = new JSONObject(response);
+
+                                               String status = obj.getString("status");
+                                               if(status.equalsIgnoreCase("successful")) {
+                                                   Log.e("status", "successful");
+                                                   Snackbar mySnackbar = Snackbar
+                                                           .make(getView(), "Nice! You were awarded 5 points.", Snackbar.LENGTH_LONG);
+
+                                                   mySnackbar.show();
+                                               } else if (status.equalsIgnoreCase("failed2")) {
+                                                   Log.e("status", "failed2");
+                                                   Snackbar mySnackbar = Snackbar
+                                                           .make(getView(), "Oops! An error occured. :(", Snackbar.LENGTH_LONG);
+
+                                                   mySnackbar.show();
+                                               }
+                                           } catch (Exception e) {
+                                               e.printStackTrace();
+                                           }
+                                        }
+
+                                        @Override
+                                        public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                                            try {
+                                                String response = new String(responseBody, "UTF-8");
+                                                JSONObject obj = new JSONObject(response);
+
+                                                String status = obj.getString("status");
+                                                if(status.equalsIgnoreCase("successful")) {
+                                                    Log.e("status", "successful");
+                                                    Snackbar mySnackbar = Snackbar
+                                                            .make(getView(), "Nice! You were awarded 5 points.", Snackbar.LENGTH_LONG);
+
+                                                    mySnackbar.show();
+                                                } else if (status.equalsIgnoreCase("failed2")) {
+                                                    Log.e("status", "failed2");
+                                                    Snackbar mySnackbar = Snackbar
+                                                            .make(getView(), "Oops! An error occured. :(", Snackbar.LENGTH_LONG);
+
+                                                    mySnackbar.show();
+                                                }
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    });
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -232,12 +294,13 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
                 if (location != null) {
                     onLocationChanged(location);
                 }
-                locationManager.requestLocationUpdates(bestProvider, 300000, 0, new android.location.LocationListener() {
+                locationManager.requestLocationUpdates(bestProvider, 3000, 0, new android.location.LocationListener() {
                     @Override
                     public void onLocationChanged(Location location) {
                         Log.d("HOY", "Calling API...");
                         prepareNearbyData(location.getLatitude(), location.getLongitude());
                         LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
+                        curPos = loc;
 
                         // For zooming automatically to the location of the marker
                         CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
@@ -410,7 +473,7 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
         prepareNearbyData(location.getLatitude(), location.getLongitude());
         LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
         googleMap.addMarker(new MarkerOptions().position(loc).title("I AM HERE").snippet("current_pos"));
-
+        curPos = loc;
         // For zooming automatically to the location of the marker
         CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
@@ -447,7 +510,7 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
             Log.e("onConnected", "Longitude: " + mLastLocation.getLongitude());
             prepareNearbyData(mLastLocation.getLatitude(), mLastLocation.getLongitude());
             LatLng loc = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-
+            curPos = loc;
             // For zooming automatically to the location of the marker
             CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
@@ -494,7 +557,7 @@ public class NearbyThronesFragment extends Fragment implements com.google.androi
 
                                     LatLng loc = new LatLng(objPost.getDouble("latitude"), objPost.getDouble("longitude"));
 
-                                    final Nearby nearby = new Nearby(objPost.getString("place_name"), objPost.getString("distance") + "km", (float) objPost.getDouble("rating"), objPost.getInt("id"), loc);
+                                    final Nearby nearby = new Nearby(objPost.getString("place_name"), objPost.getString("distance") + "km", (float) objPost.getDouble("average_rating"), objPost.getInt("id"), loc);
                                     if(nearbyList.add(nearby)) {
                                         Log.e("added", "ADDED to list");
                                     } else {

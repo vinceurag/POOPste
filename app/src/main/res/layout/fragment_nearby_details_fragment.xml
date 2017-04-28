@@ -37,4 +37,15 @@
 
     </LinearLayout>
 
+    <Button
+        android:id="@+id/beenhere"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:background="@color/colorAccent"
+        android:text="I've been here"
+        android:textColor="@color/white"
+        android:visibility="gone" />
+
 </LinearLayout>

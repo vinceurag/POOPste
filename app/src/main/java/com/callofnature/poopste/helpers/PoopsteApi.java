@@ -10,7 +10,7 @@ import com.loopj.android.http.*;
 import cz.msebera.android.httpclient.entity.StringEntity;
 
 public class PoopsteApi {
-    private static final String BASE_URL = "http://yellowbird.cafe/poopste_api/";
+    private static final String BASE_URL = "http://128.199.101.33/poopste_api/";
 
     private static AsyncHttpClient client = new AsyncHttpClient();
 

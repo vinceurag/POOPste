@@ -3,6 +3,8 @@ package com.callofnature.poopste;
 
 import android.*;
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -12,8 +14,11 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +26,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -33,6 +40,7 @@ import com.akexorcist.googledirection.util.DirectionConverter;
 import com.callofnature.poopste.adapters.NearbyAdapter;
 import com.callofnature.poopste.adapters.NearbyDetailsAdapter;
 import com.callofnature.poopste.helpers.PoopsteApi;
+import com.callofnature.poopste.model.Model;
 import com.callofnature.poopste.model.Nearby;
 import com.callofnature.poopste.model.NearbyDetails;
 import com.google.android.gms.common.ConnectionResult;
@@ -77,6 +85,7 @@ public class Nearby_details_fragment extends Fragment implements com.google.andr
     private NearbyDetailsAdapter nAdapter;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
+    ProgressDialog progress;
 
 
     @Override
@@ -95,6 +104,8 @@ public class Nearby_details_fragment extends Fragment implements com.google.andr
         recyclerView.getRecycledViewPool().setMaxRecycledViews(0, 0);
 
         recyclerView.setAdapter(nAdapter);
+
+        final Button beenHereBtn = (Button) rootView.findViewById(R.id.beenhere);
 
 
 
@@ -142,14 +153,135 @@ public class Nearby_details_fragment extends Fragment implements com.google.andr
                     return;
                 }
                 Location location = locationManager.getLastKnownLocation(bestProvider);
-                locationManager.requestLocationUpdates(bestProvider, 300000, 0, new android.location.LocationListener() {
+                locationManager.requestLocationUpdates(bestProvider, 3000, 0, new android.location.LocationListener() {
                     @Override
                     public void onLocationChanged(Location location) {
 //                        prepareNearbyData(location.getLatitude(), location.getLongitude());
                         LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
+
                         // For zooming automatically to the location of the marker
                         CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
                         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                        final Bundle args = getArguments();
+                        LatLng destination = args.getParcelable("nearby_loc");
+//                        String serverKey = "AIzaSyAY-VZ5EJssszD7-3iKEPfbGNblh6EDdx0";
+//                        GoogleDirection.withServerKey(serverKey)
+//                                .from(loc)
+//                                .to(destination)
+//                                .execute(new DirectionCallback() {
+//                                    @Override
+//                                    public void onDirectionSuccess(Direction direction, String rawBody) {
+//                                        Log.e("SUCC", "Directions successful");
+//                                        Route route = direction.getRouteList().get(0);
+//                                        Leg leg = route.getLegList().get(0);
+//                                        ArrayList<LatLng> directionPositionList = leg.getDirectionPoint();
+//                                        PolylineOptions polylineOptions = DirectionConverter.createPolyline(getContext(), directionPositionList, 5, Color.RED);
+//                                        googleMap.addPolyline(polylineOptions);
+//                                    }
+//
+//                                    @Override
+//                                    public void onDirectionFailure(Throwable t) {
+//                                        Log.e("FAILED", "Failed");
+//                                    }
+//                                });
+//                        Log.e("posChanged", "my position changed from onCreateView");
+
+                        float[] results = new float[1];
+                        Location.distanceBetween(loc.latitude, loc.longitude, destination.latitude, destination.longitude, results);
+
+                        float distance = results[0];
+
+                        if(distance < 50.00) {
+
+                            beenHereBtn.setVisibility(View.VISIBLE);
+                            beenHereBtn.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    new AlertDialog.Builder(view.getContext())
+                                            .setTitle("You've been here?")
+                                            .setMessage("Are you sure you've pooped here?")
+                                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    try {
+                                                        final Bundle args = getArguments();
+                                                        int throne_id = args.getInt("nearby_id");
+                                                        JSONObject jsonParams = new JSONObject();
+                                                        jsonParams.put("throne_id", throne_id);
+                                                        jsonParams.put("college_id", Model.getCollegeId());
+                                                        StringEntity entity = new StringEntity(jsonParams.toString());
+                                                        progress = ProgressDialog.show(getContext(), "Pooping...",
+                                                                "Verifying your request...", true);
+                                                        PoopsteApi.postWithHeader("thrones/iwashere", entity, new AsyncHttpResponseHandler() {
+                                                            @Override
+                                                            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                                                                try {
+                                                                    String response = new String(responseBody, "UTF-8");
+                                                                    JSONObject obj = new JSONObject(response);
+
+                                                                    String status = obj.getString("status");
+                                                                    Log.e("status", status);
+                                                                    progress.dismiss();
+                                                                    if(status.equalsIgnoreCase("successful")) {
+                                                                        Log.e("status", "successful");
+                                                                        Snackbar mySnackbar = Snackbar
+                                                                                .make(rootView.findViewById(R.id.details_fragment), "Nice! You've been awarded 7 points.", Snackbar.LENGTH_LONG);
+
+                                                                        mySnackbar.show();
+                                                                    } else if (status.equalsIgnoreCase("failed2")) {
+                                                                        Log.e("status", "failed2");
+                                                                        Snackbar mySnackbar = Snackbar
+                                                                                .make(rootView.findViewById(R.id.details_fragment), "Oops! You can only 'poop' once in the same area within the day.", Snackbar.LENGTH_LONG);
+
+                                                                        mySnackbar.show();
+                                                                    }
+                                                                } catch (Exception e) {
+                                                                    e.printStackTrace();
+                                                                }
+                                                            }
+
+                                                            @Override
+                                                            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                                                                try {
+                                                                    String response = new String(responseBody, "UTF-8");
+                                                                    JSONObject obj = new JSONObject(response);
+
+                                                                    String status = obj.getString("status");
+                                                                    Log.e("status", status);
+                                                                    progress.dismiss();
+                                                                    if(status.equalsIgnoreCase("failed")) {
+                                                                        Log.e("status", "failed");
+                                                                        Snackbar mySnackbar = Snackbar
+                                                                                .make(rootView.findViewById(R.id.details_fragment), "Oops. There was an error. We apologize.", Snackbar.LENGTH_LONG);
+
+                                                                        mySnackbar.show();
+                                                                    } else if (status.equalsIgnoreCase("failed2")) {
+                                                                        Log.e("status", "failed2");
+                                                                        Snackbar mySnackbar = Snackbar
+                                                                                .make(rootView.findViewById(R.id.details_fragment), "Oops! You can only 'poop' once in the same area within the day.", Snackbar.LENGTH_LONG);
+
+                                                                        mySnackbar.show();
+                                                                    }
+                                                                } catch (Exception e) {
+                                                                    e.printStackTrace();
+                                                                }
+                                                            }
+                                                        });
+                                                    } catch (Exception e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+                                            })
+                                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.cancel();
+                                                }
+                                            })
+                                            .setIcon(R.drawable.details_name_logo)
+                                            .show();
+                                }
+                            });
+                        }
+
                     }
 
                     @Override
@@ -227,34 +359,7 @@ public class Nearby_details_fragment extends Fragment implements com.google.andr
     public void onResume() {
         super.onResume();
         Log.e("ONRESUME", "onResume called");
-//        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            // TODO: Consider calling
-//            //    ActivityCompat#requestPermissions
-//            // here to request the missing permissions, and then overriding
-//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//            //                                          int[] grantResults)
-//            // to handle the case where the user grants the permission. See the documentation
-//            // for ActivityCompat#requestPermissions for more details.
-//            return;
-//        }
-//        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-//                mGoogleApiClient);
-//        if (mLastLocation != null) {
-//            mLastLocation.getLatitude();
-//            mLastLocation.getLongitude();
-//
-//            Log.d("HOY", "Calling API...");
-//            prepareNearbyData(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-//            LatLng loc = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-//
-//            // For zooming automatically to the location of the marker
-//            CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
-//            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-//
-//            Log.e("MYLOC", "I am at " + mLastLocation.getLatitude());
-//        }
-//
-//        nAdapter.notifyDataSetChanged();
+
 
         mMapView = (MapView) rootView.findViewById(R.id.mapView_details);
 
@@ -334,6 +439,105 @@ public class Nearby_details_fragment extends Fragment implements com.google.andr
             // For zooming automatically to the location of the marker
             CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            final Bundle args = getArguments();
+            LatLng destination = args.getParcelable("nearby_loc");
+            float[] results = new float[1];
+            Location.distanceBetween(loc.latitude, loc.longitude, destination.latitude, destination.longitude, results);
+
+            float distance = results[0];
+
+            Toast.makeText(getContext(), "Distance: " + distance, Toast.LENGTH_LONG).show();
+
+            if(distance < 50.00) {
+                final Button beenHereBtn = (Button) rootView.findViewById(R.id.beenhere);
+                beenHereBtn.setVisibility(View.VISIBLE);
+                beenHereBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        new AlertDialog.Builder(view.getContext())
+                                .setTitle("You've been here?")
+                                .setMessage("Are you sure you've pooped here?")
+                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        try {
+                                            final Bundle args = getArguments();
+                                            int throne_id = args.getInt("nearby_id");
+                                            JSONObject jsonParams = new JSONObject();
+                                            jsonParams.put("throne_id", throne_id);
+                                            jsonParams.put("college_id", Model.getCollegeId());
+                                            StringEntity entity = new StringEntity(jsonParams.toString());
+                                            progress = ProgressDialog.show(getContext(), "Pooping...",
+                                                    "Verifying your request...", true);
+                                            PoopsteApi.postWithHeader("thrones/iwashere", entity, new AsyncHttpResponseHandler() {
+                                                @Override
+                                                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                                                    try {
+                                                        String response = new String(responseBody, "UTF-8");
+                                                        JSONObject obj = new JSONObject(response);
+
+                                                        String status = obj.getString("status");
+                                                        Log.e("status", status);
+                                                        progress.dismiss();
+                                                        if(status.equalsIgnoreCase("successful")) {
+                                                            Log.e("status", "successful");
+                                                            Snackbar mySnackbar = Snackbar
+                                                                    .make(rootView.findViewById(R.id.details_fragment), "Nice! You were awarded 7 points.", Snackbar.LENGTH_LONG);
+
+                                                            mySnackbar.show();
+                                                        } else if (status.equalsIgnoreCase("failed2")) {
+                                                            Log.e("status", "failed2");
+                                                            Snackbar mySnackbar = Snackbar
+                                                                    .make(rootView.findViewById(R.id.details_fragment), "Oops! You can only 'poop' once in the same area within the day.", Snackbar.LENGTH_LONG);
+
+                                                            mySnackbar.show();
+                                                        }
+                                                    } catch (Exception e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                                                    try {
+                                                        String response = new String(responseBody, "UTF-8");
+                                                        JSONObject obj = new JSONObject(response);
+
+                                                        String status = obj.getString("status");
+                                                        Log.e("status", status);
+                                                        progress.dismiss();
+                                                        if(status.equalsIgnoreCase("failed")) {
+                                                            Log.e("status", "failed");
+                                                            Snackbar mySnackbar = Snackbar
+                                                                    .make(rootView.findViewById(R.id.details_fragment), "Oops. There was an error. We apologize.", Snackbar.LENGTH_LONG);
+
+                                                            mySnackbar.show();
+                                                        } else if (status.equalsIgnoreCase("failed2")) {
+                                                            Log.e("status", "failed2");
+                                                            Snackbar mySnackbar = Snackbar
+                                                                    .make(rootView.findViewById(R.id.details_fragment), "Oops! You can only 'poop' once in the same area within the day.", Snackbar.LENGTH_LONG);
+
+                                                            mySnackbar.show();
+                                                        }
+                                                    } catch (Exception e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+                                            });
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                })
+                                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.cancel();
+                                    }
+                                })
+                                .setIcon(R.drawable.details_name_logo)
+                                .show();
+                    }
+                });
+            }
         } else {
             Toast.makeText(getContext(),"ERROR: no last known location" ,Toast.LENGTH_LONG).show();
         }
@@ -358,5 +562,15 @@ public class Nearby_details_fragment extends Fragment implements com.google.andr
         // For zooming automatically to the location of the marker
         CameraPosition cameraPosition = new CameraPosition.Builder().target(loc).zoom(18).build();
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+        final Bundle args = getArguments();
+        LatLng destination = args.getParcelable("nearby_loc");
+
+        float[] results = new float[1];
+        Location.distanceBetween(loc.latitude, loc.longitude, destination.latitude, destination.longitude, results);
+
+        float distance = results[0];
+
+        Toast.makeText(getContext(), "outside: " + distance, Toast.LENGTH_LONG).show();
     }
 }

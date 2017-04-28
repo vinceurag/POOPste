@@ -13,21 +13,7 @@
     android:paddingTop="@dimen/feed_item_padding_top_bottom"
     android:background="@drawable/layout_border">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_alignParentLeft="true">
 
-        <TextView
-            android:id="@+id/college_rank"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/nearby_text_size"
-            android:textStyle="bold"
-            android:text="1st"/>
-
-    </LinearLayout>
 
 
     <LinearLayout
@@ -62,7 +48,20 @@
             android:text="100pts"/>
 
     </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentLeft="true">
 
+        <TextView
+            android:id="@+id/college_rank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/nearby_text_size"
+            android:textStyle="bold"
+            android:text="1st"/>
 
+    </LinearLayout>
 
 </RelativeLayout>

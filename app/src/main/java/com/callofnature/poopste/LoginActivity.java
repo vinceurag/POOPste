@@ -380,6 +380,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         JSONObject data = obj.getJSONObject("data");
 
                         int id = Integer.parseInt(obj.getString("id"));
+                        int collegeId = Integer.parseInt(data.getString("college_id"));
                         String googleId = data.getString("google_id");
                         String fullName = data.getString("fullname");
                         String profilePic = data.getString("profile_pic");
@@ -390,8 +391,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         Model.setGoogleId(googleId);
                         Model.setProfilePic(profilePic);
                         Model.setToken(token);
+                        Model.setCollegeId(collegeId);
 
-                        Toast.makeText(getApplicationContext(), googleId + " - " + fullName, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), googleId + " - " + Model.getCollegeId(), Toast.LENGTH_LONG).show();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         LoginActivity.this.startActivity(intent);
                         finish();

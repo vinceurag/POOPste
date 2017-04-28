@@ -20,7 +20,8 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="15dp"
         android:orientation="vertical"
-        android:layout_gravity="center">
+        android:layout_gravity="center"
+        android:visibility="gone">
 
         <TextView
             android:layout_width="wrap_content"
@@ -36,6 +37,21 @@
         android:id="@+id/recycler_view_student"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:scrollbars="vertical" />
+        android:scrollbars="vertical"
+        android:visibility="gone"/>
+
+    <LinearLayout android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center">
+        <ProgressBar
+            android:id="@+id/loading_topC"
+            style="?android:progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="visible"
+            />
+    </LinearLayout>
 
 </LinearLayout>

@@ -73,6 +73,16 @@ public class MainActivity extends AppCompatActivity
                             "An error occured while posting your status. :(", Snackbar.LENGTH_LONG);
                     mySnackbar.show();
                 }
+            } else if (extras.containsKey("reviewCreated")) {
+                if(caller.getStringExtra("reviewCreated").equals("successful")) {
+                    Snackbar mySnackbar = Snackbar.make(findViewById(R.id.content_main),
+                            "Thanks for the review! You were awarded 3 points!", Snackbar.LENGTH_LONG);
+                    mySnackbar.show();
+                } else {
+                    Snackbar mySnackbar = Snackbar.make(findViewById(R.id.content_main),
+                            "An error occured while publishing your review. :(", Snackbar.LENGTH_LONG);
+                    mySnackbar.show();
+                }
             }
         }
 
@@ -192,7 +202,6 @@ public class MainActivity extends AppCompatActivity
                         public void onResult(Status status) {
 
                             if(status.isSuccess()) {
-                                Toast.makeText(getApplicationContext(),"Logged Out - with Google" ,Toast.LENGTH_LONG).show();
                                 Model.setToken(null);
                                 Intent i=new Intent(getApplicationContext(), LoginActivity.class);
                                 startActivity(i);

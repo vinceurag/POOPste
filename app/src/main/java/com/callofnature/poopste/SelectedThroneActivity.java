@@ -147,6 +147,7 @@ public class SelectedThroneActivity extends AppCompatActivity {
                     return details_fragment;
                 case 1:
                     Nearby_review_fragment review_fragment = new Nearby_review_fragment();
+                    review_fragment.setArguments(this.fragmentBundle);
                     return review_fragment;
             }
 

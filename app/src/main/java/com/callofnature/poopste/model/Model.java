@@ -10,6 +10,7 @@ public class Model {
     private static String googleId;
     private static String profilePic;
     private static String token;
+    private static int collegeId;
 
     public static String getFullName() {
         return fullName;
@@ -49,5 +50,13 @@ public class Model {
 
     public static void setToken(String token) {
         Model.token = token;
+    }
+
+    public static int getCollegeId() {
+        return collegeId;
+    }
+
+    public static void setCollegeId(int collegeId) {
+        Model.collegeId = collegeId;
     }
 }

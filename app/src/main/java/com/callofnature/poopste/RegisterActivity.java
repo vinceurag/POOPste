@@ -10,8 +10,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
@@ -24,16 +27,21 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.callofnature.poopste.adapters.CollegesAdapter;
 import com.callofnature.poopste.helpers.PoopsteApi;
 import com.callofnature.poopste.model.Model;
+import com.callofnature.poopste.model.Nearby;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
@@ -59,6 +67,9 @@ public class RegisterActivity extends AppCompatActivity {
 
     UserSessionManager session;
     String googleId;
+    ArrayList<CollegesAdapter> colleges = new ArrayList<CollegesAdapter>();
+
+    int myCollege = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +82,60 @@ public class RegisterActivity extends AppCompatActivity {
 
         editText_FirstName = (EditText) findViewById(R.id.editText_firstName);
         editText_LastName = (EditText) findViewById(R.id.editText_lastName);
+        final List<String> spinnerArray =  new ArrayList<String>();
+
+        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                this, android.R.layout.simple_spinner_item, spinnerArray);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        Spinner sItems = (Spinner) findViewById(R.id.spinner);
+        sItems.setAdapter(adapter);
+        PoopsteApi.get("register/colleges", new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+
+                try {
+                    String response = new String(responseBody, "UTF-8");
+                    JSONArray jsonColleges = new JSONArray(response);
+
+                    for (int i = 0; i < jsonColleges.length(); i++) {
+                        try {
+                            JSONObject objCollege = jsonColleges.getJSONObject(i);
+                            CollegesAdapter ca = new CollegesAdapter();
+                            Log.e("ID", objCollege.getInt("id") + "");
+                            ca.setCollegeId(objCollege.getInt("id"));
+                            ca.setCollegeName(objCollege.getString("college"));
+                            Log.e("ID", ca.getCollegeId() + "");
+                            Log.e("name", ca.getCollegeName() + "");
+
+                            colleges.add(ca);
+                            spinnerArray.add(objCollege.getString("college"));
+                            adapter.notifyDataSetChanged();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+
+            }
+        });
+
+        sItems.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                myCollege = colleges.get(position).getCollegeId();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                myCollege = 1;
+            }
+        });
 
         // callback method to call credentialsProvider method.
         credentialsProvider();
@@ -201,6 +266,7 @@ public class RegisterActivity extends AppCompatActivity {
                         jsonParams.put("profile_pic", "https://s3-ap-southeast-1.amazonaws.com/poopste-images-bucket/" + fileName);
                         jsonParams.put("first_name", editText_FirstName.getText().toString());
                         jsonParams.put("last_name", editText_LastName.getText().toString());
+                        jsonParams.put("college_id", myCollege);
                         StringEntity entity = new StringEntity(jsonParams.toString());
                         PoopsteApi.post("register", entity, new AsyncHttpResponseHandler() {
                             @Override

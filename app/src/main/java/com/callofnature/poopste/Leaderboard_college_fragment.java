@@ -10,17 +10,26 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.callofnature.poopste.adapters.LeaderboardCollegeAdapter;
 import com.callofnature.poopste.adapters.NearbyAdapter;
+import com.callofnature.poopste.helpers.PoopsteApi;
 import com.callofnature.poopste.model.LeaderboardCollege;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
 
 
 /**
@@ -41,6 +50,9 @@ public class Leaderboard_college_fragment extends Fragment {
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private int tab_numbers;
+    ProgressBar prog;
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -56,6 +68,7 @@ public class Leaderboard_college_fragment extends Fragment {
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.getRecycledViewPool().setMaxRecycledViews(0, 0);
+        prog = (ProgressBar) rootView.findViewById(R.id.loading_topC);
 
         recyclerView.setAdapter(lAdapter);
 
@@ -66,19 +79,37 @@ public class Leaderboard_college_fragment extends Fragment {
 
 
     private void prepareCollegeData() {
-        LeaderboardCollege college = new LeaderboardCollege("Institute of Information and Computing Sciences", "100pts","1st");
-        collegeLeaderboardList.add(college);
 
-        college = new LeaderboardCollege("Faculty of Engineering", "90pts","2nd");
-        collegeLeaderboardList.add(college);
 
-        college = new LeaderboardCollege("College of Nursing", "80pts","3rd");
-        collegeLeaderboardList.add(college);
 
-        college = new LeaderboardCollege("Faculty of Arts and Letters", "50pts","4th");
-        collegeLeaderboardList.add(college);
+        PoopsteApi.get("leaderboard/colleges", new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String response = new String(responseBody, "UTF-8");
+                    JSONArray list = new JSONArray(response);
+                    LeaderboardCollege college;
+                    for (int i = 0; i < list.length(); i++) {
+                        JSONObject obj = list.getJSONObject(i);
+                        college = new LeaderboardCollege(obj.getString("college"), obj.getInt("SUM") + "pts", obj.getString("position"));
+                        collegeLeaderboardList.add(college);
+                        lAdapter.notifyDataSetChanged();
+                    }
+                    prog.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
 
-        lAdapter.notifyDataSetChanged();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Log.e("Err", "error");
+            }
+        });
+
+
     }
 
 

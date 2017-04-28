@@ -171,41 +171,41 @@
 
     <!-- Find Directions -->
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="center"
-        android:layout_marginTop="5dp">
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:layout_marginTop="5dp">-->
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_vertical">
+        <!--<RelativeLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_gravity="center_vertical">-->
 
-            <ImageButton
-                android:id="@+id/been_here"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:background="@drawable/details_beenhere_logo"/>
-
-            <!--<TextView-->
-                <!--android:id="@+id/done"-->
+            <!--<ImageButton-->
+                <!--android:id="@+id/been_here"-->
                 <!--android:layout_width="wrap_content"-->
                 <!--android:layout_height="wrap_content"-->
-                <!--android:drawableTop="@drawable/details_beenhere_logo"-->
                 <!--android:layout_centerInParent="true"-->
-                <!--android:gravity="center_vertical"-->
-                <!--android:text="I've been here!"-->
-                <!--android:textStyle="bold"-->
-                <!--android:layout_marginTop="5dp"-->
-                <!--android:layout_marginLeft="50dp"-->
-                <!--android:textColor="@color/white"/>-->
+                <!--android:background="@drawable/details_beenhere_logo"/>-->
 
-        </RelativeLayout>
+            <!--&lt;!&ndash;<TextView&ndash;&gt;-->
+                <!--&lt;!&ndash;android:id="@+id/done"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:drawableTop="@drawable/details_beenhere_logo"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:layout_centerInParent="true"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:gravity="center_vertical"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:text="I've been here!"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:textStyle="bold"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:layout_marginTop="5dp"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:layout_marginLeft="50dp"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:textColor="@color/white"/>&ndash;&gt;-->
 
-    </LinearLayout>
+        <!--</RelativeLayout>-->
+
+    <!--</LinearLayout>-->
 
     <!-- End of Find Directions -->
 
