@@ -310,6 +310,7 @@ public class Nearby_details_fragment extends Fragment implements com.google.andr
 
     private void prepareDetailsData(LatLng loc) {
         googleMap.clear();
+        nearbyDetailsList.clear();
         final Bundle args = getArguments();
         NearbyDetails nearby_info = new NearbyDetails(args.getString("nearby_name"), args.getString("nearby_distance"), args.getFloat("nearby_rating"));
         nearbyDetailsList.add(nearby_info);

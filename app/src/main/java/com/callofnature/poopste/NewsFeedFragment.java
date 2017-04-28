@@ -155,6 +155,7 @@ public class NewsFeedFragment extends Fragment {
             }
         });
 
+
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -209,6 +210,8 @@ public class NewsFeedFragment extends Fragment {
 
     private void prepareFeedData() {
 
+
+
         PoopsteApi.getWithHeader("posts/" + pageNumber, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
@@ -217,49 +220,49 @@ public class NewsFeedFragment extends Fragment {
                     String response = new String(responseBody, "UTF-8");
                     JSONObject obj = new JSONObject(response);
                     jsonPosts = obj.getJSONArray("data");
+                    if(jsonPosts != null) {
 
+                        if(pageNumber > 0) {
+                            posts.remove(posts.size() - 1);
+                            fAdapter.notifyItemRemoved(posts.size());
+
+                        }
+                        for (int i = 0; i < jsonPosts.length(); i++) {
+                            try {
+                                JSONObject objPost = jsonPosts.getJSONObject(i);
+                                String dateStr = objPost.getString("date_created");
+                                Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(dateStr);
+                                sdfDate = new SimpleDateFormat("MMM. dd, yyyy hh:mm aaa");//dd/MM/yyyy
+                                posting_date = sdfDate.format(date);
+
+                                post = new Feed(objPost.getString("fullname"), objPost.getString("status"), objPost.getString("profile_pic"), objPost.getString("photo"), posting_date);
+                                posts.add(post);
+
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        fAdapter.notifyItemInserted(posts.size());
+                                    }
+                                });
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                        loadingCircle.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                        swipeRefreshLayout.setVisibility(View.VISIBLE);
+
+                        swipeRefreshLayout.setRefreshing(false);
+                        fAdapter.setLoaded();
+                    }
 
 
 
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                if(jsonPosts != null) {
 
-                    if(pageNumber > 0) {
-                        posts.remove(posts.size() - 1);
-                        fAdapter.notifyItemRemoved(posts.size());
-
-                    }
-                    for (int i = 0; i < jsonPosts.length(); i++) {
-                        try {
-                            JSONObject objPost = jsonPosts.getJSONObject(i);
-                            String dateStr = objPost.getString("date_created");
-                            Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(dateStr);
-                            sdfDate = new SimpleDateFormat("MMM. dd, yyyy hh:mm aaa");//dd/MM/yyyy
-                            posting_date = sdfDate.format(date);
-
-                            post = new Feed(objPost.getString("fullname"), objPost.getString("status"), objPost.getString("profile_pic"), objPost.getString("photo"), posting_date);
-                            posts.add(post);
-
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    fAdapter.notifyItemInserted(posts.size());
-                                }
-                            });
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-                    loadingCircle.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                    swipeRefreshLayout.setVisibility(View.VISIBLE);
-
-                    swipeRefreshLayout.setRefreshing(false);
-                    fAdapter.setLoaded();
-                }
 
 
             }
@@ -275,6 +278,9 @@ public class NewsFeedFragment extends Fragment {
     private void refreshContent(final View rootView){
         if(NetworkConnection.isConnectedToNetwork(getActivity().getApplicationContext()))
         {
+            clear();
+            pageNumber = 0;
+            Log.e("swiped", "SWIPE REFRESH DETECTED");
             prepareFeedData();
         }
         else

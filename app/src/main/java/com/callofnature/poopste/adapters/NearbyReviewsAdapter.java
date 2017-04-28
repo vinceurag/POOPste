@@ -1,5 +1,12 @@
 package com.callofnature.poopste.adapters;
 
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
+import android.os.Build;
+import android.support.annotation.ColorInt;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +36,25 @@ public class NearbyReviewsAdapter extends RecyclerView.Adapter<NearbyReviewsAdap
             username = (TextView) view.findViewById(R.id.reviews_username);
             content = (TextView) view.findViewById(R.id.reviews_content);
             rating = (RatingBar) view.findViewById(R.id.reviews_ratingBar);
+            LayerDrawable stars = (LayerDrawable) rating.getProgressDrawable();
+            // Filled stars
+            setRatingStarColor(stars.getDrawable(2), ContextCompat.getColor(view.getContext(), R.color.colorAccent));
+            // Half filled stars
+            setRatingStarColor(stars.getDrawable(1), ContextCompat.getColor(view.getContext(), R.color.colorPrimaryDark));
+            // Empty stars
+            setRatingStarColor(stars.getDrawable(0), ContextCompat.getColor(view.getContext(), R.color.colorPrimaryDark));
+        }
+    }
+
+    private void setRatingStarColor(Drawable drawable, @ColorInt int color)
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            DrawableCompat.setTint(drawable, color);
+        }
+        else
+        {
+            drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
         }
     }
 
